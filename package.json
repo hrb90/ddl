@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/hrb90/ddl/issues"
   },
-  "homepage": "https://github.com/hrb90/ddl#readme"
+  "homepage": "https://github.com/hrb90/ddl#readme",
+  "dependencies": {
+    "d3": "^4.7.0"
+  }
 }
