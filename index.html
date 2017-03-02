@@ -4,10 +4,43 @@
     <meta charset="utf-8">
     <script src="./bundle.js" charset="utf-8"></script>
     <script type="text/javascript" src="./data/all_data.json"></script>
+    <style media="screen">
+      #chart {
+        padding: 15px;
+      }
+    </style>
     <title></title>
   </head>
   <body>
-    <svg id="chart" width="1200" height="600">
+    <svg id="chart" width="1170" height="570">
     </svg>
+    <div id="attrSelectorForms">
+      <select id="attrX">
+        <option value="tsPct">TS%</option>
+        <option value="astPct">AST%</option>
+        <option value="oRbPct">ORB%</option>
+        <option value="dRbPct">DRB%</option>
+        <option value="tRbPct">TRB%</option>
+        <option value="stlPct">STL%</option>
+        <option value="blkPct">BLK%</option>
+        <option value="usgPct">USG%</option>
+        <option value="obpm">OBPM</option>
+        <option value="dpbm">DBPM</option>
+        <option value="bpm">BPM</option>
+      </select>
+      <select id="attrY">
+        <option value="tsPct">TS%</option>
+        <option value="astPct">AST%</option>
+        <option value="oRbPct">ORB%</option>
+        <option value="dRbPct">DRB%</option>
+        <option value="tRbPct">TRB%</option>
+        <option value="stlPct">STL%</option>
+        <option value="blkPct">BLK%</option>
+        <option value="usgPct">USG%</option>
+        <option value="obpm">OBPM</option>
+        <option value="dpbm">DBPM</option>
+        <option value="bpm">BPM</option>
+      </select>
+    </div>
   </body>
 </html>

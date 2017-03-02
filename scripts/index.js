@@ -8,55 +8,75 @@ function simpleAttrSetterFactory(propName, propTransform) {
   };
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  window.d3 = d3;
+var picker = function(player) {
+  switch(player.position) {
+    case "PG":
+      return "red";
+    case "SG":
+      return "orange";
+    case "SF":
+      return "yellow";
+    case "PF":
+      return "green";
+    case "C":
+      return "blue";
+  }
+};
 
-  var canvas = new DDLCanvas("chart");
-  var attrX = "stlPct";
-  var attrY = "blkPct";
-
-  var picker = function(player) {
-    switch(player.position) {
-      case "PG":
-        return "red";
-      case "SG":
-        return "orange";
-      case "SF":
-        return "yellow";
-      case "PF":
-        return "green";
-      case "C":
-        return "blue";
-    }
-  };
-
+function makeScatterPlotFactory(attrX, attrY,
+          attrArea = "minutes",
+          baseRadius = 10,
+          colorPicker = picker) {
   var circleFactory = new AppenderFactoryFactory("circle");
   circleFactory.setDataPrecomputer(function(data) {
     var xBounds = d3.extent(data.map(function(d) { return d[attrX]; }));
     var yBounds = d3.extent(data.map(function(d) { return d[attrY]; }));
-    var avgSqrtMins = d3.mean(data.map(function(d) { return Math.sqrt(d.minutes); }));
+    var avgRadius = d3.mean(data.map(function(d) { return Math.sqrt(d[attrArea]); }));
     return {
       xBounds: xBounds,
       yBounds: yBounds,
-      avgSqrtMins: avgSqrtMins
+      avgRadius: avgRadius
     };
   });
   circleFactory.addAttributeSetter('cx',
-    simpleAttrSetterFactory(attrX, function(x, dataOptions) {
-      return dataOptions.width * (x - dataOptions.xBounds[0]) / (dataOptions.xBounds[1] - dataOptions.xBounds[0]);
-    }));
+  simpleAttrSetterFactory(attrX, function(x, dataOptions) {
+    return dataOptions.width * (x - dataOptions.xBounds[0]) / (dataOptions.xBounds[1] - dataOptions.xBounds[0]);
+  }));
   circleFactory.addAttributeSetter('cy',
-    simpleAttrSetterFactory(attrY, function(y, dataOptions) {
-      return dataOptions.height * (dataOptions.yBounds[1] - y) / (dataOptions.yBounds[1] - dataOptions.yBounds[0]);
-    }));
+  simpleAttrSetterFactory(attrY, function(y, dataOptions) {
+    return dataOptions.height * (dataOptions.yBounds[1] - y) / (dataOptions.yBounds[1] - dataOptions.yBounds[0]);
+  }));
   circleFactory.addAttributeSetter('r',
-    simpleAttrSetterFactory("minutes", function(mins, dataOptions) {
-      return 10 * ( Math.sqrt(mins) / dataOptions.avgSqrtMins );
-    }));
-  circleFactory.addAttributeSetter('fill', picker);
+  simpleAttrSetterFactory(attrArea, function(a, dataOptions) {
+    return baseRadius * ( Math.sqrt(a) / dataOptions.avgRadius );
+  }));
+  circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',
-    simpleAttrSetterFactory("playerId", function(x) { return x; }));
+  simpleAttrSetterFactory("playerId", function(x) { return x; }));
 
-  canvas.setAppenderFactory(circleFactory.toFactory());
+  return circleFactory.toFactory();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  window.d3 = d3;
+
+  var canvas = new DDLCanvas("chart");
+  var attrXSelector = document.getElementById("attrX");
+  var attrYSelector = document.getElementById("attrY");
+
+
+  canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
   canvas.renderData(window.nbaData);
+
+  attrXSelector.addEventListener("change", e => {
+    canvas.clearCanvas();
+    canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
+    canvas.renderData(window.nbaData);
+  });
+
+  attrYSelector.addEventListener("change", e => {
+    canvas.clearCanvas();
+    canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
+    canvas.renderData(window.nbaData);
+  });
 });

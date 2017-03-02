@@ -37,6 +37,7 @@ AppenderFactoryFactory.prototype.toFactory = function () {
     var dataDigest = that.precomputeDataOptions(data, options);
     return function(dataPoint, idx) {
       var newDOMElement = document.createElementNS(d3.namespaces.svg, that.baseType);
+      newDOMElement.className = "ddl-element";
 
       for (var i = 0; i < that.subFactories.length; i++) {
         var child = that.subFactories[i](data, options)(dataPoint, idx);
