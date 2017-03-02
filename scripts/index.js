@@ -68,15 +68,21 @@ document.addEventListener("DOMContentLoaded", function() {
   canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
   canvas.renderData(window.nbaData);
 
-  attrXSelector.addEventListener("change", e => {
+  document.getElementById("attrSelectorForms").addEventListener("change", e => {
     canvas.clearCanvas();
     canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
     canvas.renderData(window.nbaData);
   });
 
-  attrYSelector.addEventListener("change", e => {
+  document.getElementById("filters").addEventListener("change", e => {
     canvas.clearCanvas();
-    canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
+    canvas.clearFilters();
+    var posFilters = document.getElementsByClassName('posFilter');
+    var posList = [];
+    [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
+    canvas.addFilter(function(d) { return posList.includes(d.position); });
+    var spanFilters = document.getElementsByClassName('spanFilter');
+    [].forEach.call(spanFilters, function(el) { canvas.addFilter(el.data-filter); });
     canvas.renderData(window.nbaData);
   });
 });
