@@ -57,32 +57,70 @@ function makeScatterPlotFactory(attrX, attrY,
   return circleFactory.toFactory();
 }
 
+
 document.addEventListener("DOMContentLoaded", function() {
   window.d3 = d3;
 
   var canvas = new DDLCanvas("chart");
   var attrXSelector = document.getElementById("attrX");
   var attrYSelector = document.getElementById("attrY");
-
-
   canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
   canvas.renderData(window.nbaData);
 
-  document.getElementById("attrSelectorForms").addEventListener("change", e => {
-    canvas.clearCanvas();
-    canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
-    canvas.renderData(window.nbaData);
-  });
-
-  document.getElementById("filters").addEventListener("change", e => {
+  function gatherAndReRender() {
     canvas.clearCanvas();
     canvas.clearFilters();
+    canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
     var posFilters = document.getElementsByClassName('posFilter');
     var posList = [];
     [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
     canvas.addFilter(function(d) { return posList.includes(d.position); });
     var spanFilters = document.getElementsByClassName('spanFilter');
-    [].forEach.call(spanFilters, function(el) { canvas.addFilter(el.data-filter); });
+    [].forEach.call(spanFilters, function(el) { canvas.addFilter(el.data.filter); });
     canvas.renderData(window.nbaData);
+  }
+
+  document.getElementById("attrSelectorForms").addEventListener("change", gatherAndReRender);
+
+  document.getElementById("filters").addEventListener("change", gatherAndReRender);
+
+  document.getElementById("filters").addEventListener("click", function(e) {
+    if (e.target.className === "spanFilter") {
+     e.target.remove();
+     gatherAndReRender();
+    }
+  });
+
+  document.getElementById("new-filter-button").addEventListener("click", function(e) {
+    document.getElementById("new-filter-form").className = "";
+  });
+
+  document.getElementById("new-filter-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    var attrName = document.getElementById("filter-attr").value;
+    var filterString = attrName;
+    var comp = document.getElementById("comparator").value;
+    filterString = filterString + " " + comp;
+    var thresholdEl = document.getElementById("threshold");
+    var threshold = thresholdEl.value;
+    thresholdEl.value = "";
+    filterString = filterString + " " + threshold;
+    var filterSpan = document.createElement("span");
+    filterSpan.className = "spanFilter";
+    filterSpan.innerText = filterString;
+    filterSpan.data = { filter: function (d) {
+        switch(comp) {
+          case "<=":
+            return d[attrName] <= (+threshold);
+          case "=":
+            return d[attrName] === (+threshold);
+          case ">=":
+            return d[attrName] >= (+threshold);
+        }
+      }
+    };
+    document.getElementById("filters").append(filterSpan);
+    e.currentTarget.className = "hidden";
+    gatherAndReRender();
   });
 });
