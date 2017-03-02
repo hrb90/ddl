@@ -8,6 +8,10 @@
       #chart {
         padding: 15px;
       }
+
+      .hidden {
+        display: none;
+      }
     </style>
     <title></title>
   </head>
@@ -57,5 +61,29 @@
       <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
       <button id="new-filter-button">Add filter</button>
     </div>
+    <form id="new-filter-form" class="hidden">
+      <select id="filter-attr">
+        <option value="tsPct">TS%</option>
+        <option value="astPct">AST%</option>
+        <option value="oRbPct">ORB%</option>
+        <option value="dRbPct">DRB%</option>
+        <option value="tRbPct">TRB%</option>
+        <option value="stlPct">STL%</option>
+        <option value="blkPct">BLK%</option>
+        <option value="usgPct">USG%</option>
+        <option value="obpm">OBPM</option>
+        <option value="dbpm">DBPM</option>
+        <option value="bpm">BPM</option>
+        <option value="minutes">Minutes</option>
+        <option value="age">Age</option>
+      </select>
+      <select id="comparator">
+        <option value="<="><=</option>
+        <option value="=">=</option>
+        <option value=">=">>=</option>
+      </select>
+      <input type="text" id="threshold">
+      <input type="Submit" value="Add Filter">
+    </form>
   </body>
 </html>
