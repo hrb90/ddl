@@ -13,7 +13,9 @@ DDLCanvas.prototype.addFilter = function(filter) {
   this.filters.push(filter);
 };
 
-DDLCanvas.prototype.clearCanvas = function () { };
+DDLCanvas.prototype.clearCanvas = function () {
+  var elements = this.canvas.selectAll("circle").remove();
+};
 
 DDLCanvas.prototype.clearFilters = function () {
   this.filters = [];
