@@ -1,7 +1,7 @@
 var d3 = require('d3');
 var DDLCanvas = require('./ddl_canvas');
-var makeScatterPlotFactory = require('./appenders/scatter_plot_factory');
-var makeToolTipFactory = require('./appenders/tooltip_factory');
+var makeCircleFactory = require('./appenders/circle_factory');
+var TooltipFactories = require('./appenders/tooltip_factory');
 var makeFilterSpan = require('./make_filter_span');
 var nbaData = require('../data/all_data.json');
 
@@ -10,14 +10,14 @@ document.addEventListener("DOMContentLoaded", function() {
   window.d3 = d3;
 
   var canvas = new DDLCanvas("chart");
-  canvas.addTooltips(makeToolTipFactory("playerId"));
+  canvas.addTooltips(TooltipFactories.makeBasicPlayerTooltipFactory());
   var attrXSelector = document.getElementById("attrX");
   var attrYSelector = document.getElementById("attrY");
 
   function gatherAndReRender() {
     canvas.clearCanvas();
     canvas.clearFilters();
-    canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
+    canvas.setAppenderFactory(makeCircleFactory(attrXSelector.value, attrYSelector.value));
     var posFilters = document.getElementsByClassName('posFilter');
     var posList = [];
     [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
