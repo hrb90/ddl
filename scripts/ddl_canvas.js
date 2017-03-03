@@ -1,15 +1,22 @@
 var d3 = require('d3');
 
+
 function DDLCanvas(svgId) {
   this.svgId = svgId;
   this.canvas = d3.select(`#${svgId}`);
   this.filters = [];
   this.pinBounds = false;
   this.appenderFactory = function() { return function() { }; };
+  this.tooltipFactory = null;
 }
+
 
 DDLCanvas.prototype.addFilter = function(filter) {
   this.filters.push(filter);
+};
+
+DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
+  this.tooltipFactory = tooltipFactory;
 };
 
 DDLCanvas.prototype.clearCanvas = function () {
@@ -44,11 +51,34 @@ DDLCanvas.prototype.pinBoundaries = function () {
 DDLCanvas.prototype.renderData = function (data) {
   var filteredData = this.filter(data);
   var appender = this.appenderFactory(filteredData, this.getFactoryOptions());
-  console.log(appender);
-  this.canvas.selectAll(`#${this.svgId}`)
+  var tooltipAppender, tooltip;
+  if (this.tooltipFactory) {
+    tooltip = d3.select('body').append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
+    tooltipAppender = this.tooltipFactory(filteredData, this.getFactoryOptions());
+  }
+  var plot = this.canvas.selectAll(`#${this.svgId}`)
     .data(filteredData)
     .enter()
     .append(appender);
+  if (tooltipAppender) {
+    plot.on("mouseover", function(d) {
+      tooltip.transition().duration(200).style("opacity", 0.9);
+      tooltip.style("left", (d3.event.pageX) + "px")
+      .style("top", (d3.event.pageY - 28) + "px")
+      .style("color", "black");
+      tooltip.html(tooltipAppender(d).outerHTML);
+    })
+    .on("mouseout", function() {
+      tooltip.transition().duration(200).style("opacity", 0);
+      tooltip.html("");
+    });
+  }
+};
+
+DDLCanvas.prototype.removeTooltips = function () {
+  this.tooltipFactory = null;
 };
 
 DDLCanvas.prototype.setAppenderFactory = function (appenderFactory) {

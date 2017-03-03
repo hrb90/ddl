@@ -3,7 +3,7 @@ var AppenderFactoryFactory = require('./appender_factory_factory');
 var simpleAttrSetterFactory = require('./simple_attr_setter_factory');
 var colorPickers = require('./color_pickers.js');
 
-function makeScatterPlotFactory(attrX, attrY,
+function makeCircleFactory(attrX, attrY,
           attrArea = "minutes",
           baseRadius = 10,
           colorPicker = colorPickers.positionPicker) {
@@ -37,4 +37,4 @@ function makeScatterPlotFactory(attrX, attrY,
   return circleFactory.toFactory();
 }
 
-module.exports = makeScatterPlotFactory;
+module.exports = makeCircleFactory;

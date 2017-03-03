@@ -4,6 +4,7 @@ function AppenderFactoryFactory(baseType = "g", subFactories = [], attrSetters =
   this.baseType = baseType;
   this.subFactories = subFactories;
   this.attrSetters = attrSetters;
+  this.innerHTMLSetter = function () { return ""; };
   this.precomputeDataOptions = function(data) { return data; };
 }
 
@@ -30,6 +31,9 @@ AppenderFactoryFactory.prototype.setDataPrecomputer = function (precomputer) {
   this.precomputeDataOptions = precomputer;
 };
 
+AppenderFactoryFactory.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
+  this.innerHTMLSetter = innerHTMLSetter;
+};
 
 AppenderFactoryFactory.prototype.toFactory = function () {
   var that = this;
@@ -38,6 +42,8 @@ AppenderFactoryFactory.prototype.toFactory = function () {
     return function(dataPoint, idx) {
       var newDOMElement = document.createElementNS(d3.namespaces.svg, that.baseType);
       newDOMElement.className = "ddl-element";
+
+      newDOMElement.innerHTML = that.innerHTMLSetter(dataPoint, idx, Object.assign({}, options, dataDigest));
 
       for (var i = 0; i < that.subFactories.length; i++) {
         var child = that.subFactories[i](data, options)(dataPoint, idx);
