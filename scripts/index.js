@@ -1,6 +1,7 @@
 var d3 = require('d3');
 var DDLCanvas = require('./ddl_canvas');
-var makeScatterPlotFactory = require('./appenders/circle_factory');
+var makeScatterPlotFactory = require('./appenders/scatter_plot_factory');
+var makeToolTipFactory = require('./appenders/tooltip_factory');
 var makeFilterSpan = require('./make_filter_span');
 var nbaData = require('../data/all_data.json');
 
@@ -9,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
   window.d3 = d3;
 
   var canvas = new DDLCanvas("chart");
+  canvas.addTooltips(makeToolTipFactory("playerId"));
   var attrXSelector = document.getElementById("attrX");
   var attrYSelector = document.getElementById("attrY");
 
