@@ -72,7 +72,6 @@ DDLCanvas.prototype.renderData = function (data) {
     })
     .on("mouseout", function() {
       tooltip.transition().duration(200).style("opacity", 0);
-      tooltip.html("");
     });
   }
 };
