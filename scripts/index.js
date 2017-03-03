@@ -1,6 +1,8 @@
 var d3 = require('d3');
 var DDLCanvas = require('./ddl_canvas');
 var AppenderFactoryFactory = require('./appender_factory_factory');
+var makeFilterSpan = require('./make_filter_span');
+var nbaData = require('../data/all_data.json');
 
 function simpleAttrSetterFactory(propName, propTransform) {
   return function(dataPoint, idx, dataOptions) {
@@ -65,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
   var attrXSelector = document.getElementById("attrX");
   var attrYSelector = document.getElementById("attrY");
   canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
-  canvas.renderData(window.nbaData);
+  canvas.renderData(nbaData);
 
   function gatherAndReRender() {
     canvas.clearCanvas();
@@ -75,9 +77,9 @@ document.addEventListener("DOMContentLoaded", function() {
     var posList = [];
     [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
     canvas.addFilter(function(d) { return posList.includes(d.position); });
-    var spanFilters = document.getElementsByClassName('spanFilter');
+    var spanFilters = document.getElementsByClassName('span-filter');
     [].forEach.call(spanFilters, function(el) { canvas.addFilter(el.data.filter); });
-    canvas.renderData(window.nbaData);
+    canvas.renderData(nbaData);
   }
 
   document.getElementById("attrSelectorForms").addEventListener("change", gatherAndReRender);
@@ -85,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("filters").addEventListener("change", gatherAndReRender);
 
   document.getElementById("filters").addEventListener("click", function(e) {
-    if (e.target.className === "spanFilter") {
+    if (e.target.className === "span-filter") {
      e.target.remove();
      gatherAndReRender();
     }
@@ -98,28 +100,11 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("new-filter-form").addEventListener("submit", function(e) {
     e.preventDefault();
     var attrName = document.getElementById("filter-attr").value;
-    var filterString = attrName;
     var comp = document.getElementById("comparator").value;
-    filterString = filterString + " " + comp;
     var thresholdEl = document.getElementById("threshold");
     var threshold = thresholdEl.value;
     thresholdEl.value = "";
-    filterString = filterString + " " + threshold;
-    var filterSpan = document.createElement("span");
-    filterSpan.className = "spanFilter";
-    filterSpan.innerText = filterString;
-    filterSpan.data = { filter: function (d) {
-        switch(comp) {
-          case "<=":
-            return d[attrName] <= (+threshold);
-          case "=":
-            return d[attrName] === (+threshold);
-          case ">=":
-            return d[attrName] >= (+threshold);
-        }
-      }
-    };
-    document.getElementById("filters").append(filterSpan);
+    document.getElementById("filters").append(makeFilterSpan(attrName, comp, threshold));
     e.currentTarget.className = "hidden";
     gatherAndReRender();
   });
