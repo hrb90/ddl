@@ -5,7 +5,6 @@ function DDLCanvas(svgId) {
   this.canvas = d3.select(`#${svgId}`);
   this.filters = [];
   this.pinBounds = false;
-  this.showOutliers = false;
   this.appenderFactory = function() { return function() { }; };
 }
 
@@ -21,17 +20,11 @@ DDLCanvas.prototype.clearFilters = function () {
   this.filters = [];
 };
 
-DDLCanvas.prototype.excludeOutliers = function () {
-  this.showOutliers = false;
-};
 
 DDLCanvas.prototype.filter = function (data) {
-  var myFilters = this.filters.slice(0);
-  if (!this.showOutliers) {
-    myFilters.push(function(d) { return d.minutes > 100; });
-  }
+  var that = this;
   return data.filter(function(d) {
-    return myFilters.every(function(f) { return f(d); } );
+    return that.filters.every(function(f) { return f(d); } );
   });
 };
 
@@ -40,13 +33,9 @@ DDLCanvas.prototype.getFactoryOptions = function () {
     width: this.canvas.nodes()[0].width.baseVal.value,
     height: this.canvas.nodes()[0].height.baseVal.value,
     pinBounds: this.pinBounds,
-    showOutliers: this.showOutliers
   };
 };
 
-DDLCanvas.prototype.includeOutliers = function () {
-  this.showOutliers = true;
-};
 
 DDLCanvas.prototype.pinBoundaries = function () {
   this.pinBounds = true;
