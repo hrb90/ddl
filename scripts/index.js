@@ -66,8 +66,6 @@ document.addEventListener("DOMContentLoaded", function() {
   var canvas = new DDLCanvas("chart");
   var attrXSelector = document.getElementById("attrX");
   var attrYSelector = document.getElementById("attrY");
-  canvas.setAppenderFactory(makeScatterPlotFactory(attrXSelector.value, attrYSelector.value));
-  canvas.renderData(nbaData);
 
   function gatherAndReRender() {
     canvas.clearCanvas();
@@ -83,6 +81,8 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   document.getElementById("attrSelectorForms").addEventListener("change", gatherAndReRender);
+
+  document.getElementById("filters").append(makeFilterSpan("minutes", ">=", "400"));
 
   document.getElementById("filters").addEventListener("change", gatherAndReRender);
 
@@ -108,4 +108,6 @@ document.addEventListener("DOMContentLoaded", function() {
     e.currentTarget.className = "hidden";
     gatherAndReRender();
   });
+
+  gatherAndReRender();
 });
