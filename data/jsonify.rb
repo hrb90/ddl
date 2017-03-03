@@ -7,6 +7,7 @@ def transform_player_season(row)
   new_row = {}
   # Extract player ID
   new_row["playerId"] = row["Player"].split("\\")[1]
+  new_row["name"] = row["Player"].split("\\")[0]
   new_row["age"] = row["Age"].to_i
   new_row["team"] = row["Tm"]
   # Only take primary position
