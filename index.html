@@ -29,75 +29,43 @@
   <body>
     <svg id="chart" width="1170" height="570">
     </svg>
-    <div id="attrSelectorForms">
-      <select id="attrX">
-        <option value="tsPct">TS%</option>
-        <option value="astPct">AST%</option>
-        <option value="oRbPct">ORB%</option>
-        <option value="dRbPct">DRB%</option>
-        <option value="tRbPct">TRB%</option>
-        <option value="stlPct">STL%</option>
-        <option value="blkPct">BLK%</option>
-        <option selected value="usgPct">USG%</option>
-        <option value="tovPct">TOV%</option>
-        <option value="obpm">OBPM</option>
-        <option value="dbpm">DBPM</option>
-        <option value="bpm">BPM</option>
-        <option value="minutes">Minutes</option>
-      </select>
-      <select id="attrY">
-        <option value="tsPct">TS%</option>
-        <option selected value="astPct">AST%</option>
-        <option value="oRbPct">ORB%</option>
-        <option value="dRbPct">DRB%</option>
-        <option value="tRbPct">TRB%</option>
-        <option value="stlPct">STL%</option>
-        <option value="blkPct">BLK%</option>
-        <option value="usgPct">USG%</option>
-        <option value="tovPct">TOV%</option>
-        <option value="obpm">OBPM</option>
-        <option value="dbpm">DBPM</option>
-        <option value="bpm">BPM</option>
-        <option value="minutes">Minutes</option>
-      </select>
+    <div id="attribute-selectors">
+      <span id="attr-selector-clicker">Select attributes to plot</span>
+      <div id="attrSelectorForms" class="hidden">
+        <label for="#attrX">X axis</label>
+        <select class="attr-selector" id="attrX">
+        </select>
+        <label for="#attrY">Y axis</label>
+        <select class="attr-selector" id="attrY">
+        </select>
+      </div>
     </div>
-    <div id="filters">
-      <label for="chkPG">PG</label>
-      <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
-      <label for="chkSG">SG</label>
-      <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
-      <label for="chkSF">SF</label>
-      <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
-      <label for="chkPF">PF</label>
-      <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
-      <label for="chkC">C</label>
-      <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
-      <button id="new-filter-button">Add filter</button>
+    <div id="filter-container">
+      <span id="filter-clicker">Filters</span>
+      <div id="filters" class="hidden">
+        <label for="chkPG">PG</label>
+        <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
+        <label for="chkSG">SG</label>
+        <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
+        <label for="chkSF">SF</label>
+        <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
+        <label for="chkPF">PF</label>
+        <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
+        <label for="chkC">C</label>
+        <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+        <button id="new-filter-button">Add filter</button>
+      </div>
+      <form id="new-filter-form" class="hidden">
+        <select class="attr-selector filter" id="filter-attr">
+        </select>
+        <select id="comparator">
+          <option value="<="><=</option>
+          <option value="=">=</option>
+          <option value=">=">>=</option>
+        </select>
+        <input type="text" id="threshold">
+        <input type="Submit" value="Add Filter">
+      </form>
     </div>
-    <form id="new-filter-form" class="hidden">
-      <select id="filter-attr">
-        <option value="tsPct">TS%</option>
-        <option value="astPct">AST%</option>
-        <option value="oRbPct">ORB%</option>
-        <option value="dRbPct">DRB%</option>
-        <option value="tRbPct">TRB%</option>
-        <option value="stlPct">STL%</option>
-        <option value="blkPct">BLK%</option>
-        <option value="usgPct">USG%</option>
-        <option value="tovPct">TOV%</option>
-        <option value="obpm">OBPM</option>
-        <option value="dbpm">DBPM</option>
-        <option value="bpm">BPM</option>
-        <option value="minutes">Minutes</option>
-        <option value="age">Age</option>
-      </select>
-      <select id="comparator">
-        <option value="<="><=</option>
-        <option value="=">=</option>
-        <option value=">=">>=</option>
-      </select>
-      <input type="text" id="threshold">
-      <input type="Submit" value="Add Filter">
-    </form>
   </body>
 </html>

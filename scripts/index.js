@@ -3,6 +3,7 @@ var DDLCanvas = require('./ddl_canvas');
 var makeCircleFactory = require('./appenders/circle_factory');
 var TooltipFactories = require('./appenders/tooltip_factory');
 var makeFilterSpan = require('./make_filter_span');
+var attributes = require('./attrs');
 var nbaData = require('../data/all_data.json');
 
 
@@ -26,6 +27,31 @@ document.addEventListener("DOMContentLoaded", function() {
     [].forEach.call(spanFilters, function(el) { canvas.addFilter(el.data.filter); });
     canvas.renderData(nbaData);
   }
+
+  var attrSelectors = d3.selectAll('.attr-selector');
+
+  Object.keys(attributes.basicAttributes).forEach(function(attr) {
+    attrSelectors.append("option")
+      .attr("value", attr)
+      .text(attributes.basicAttributes[attr]);
+  });
+
+  Object.keys(attributes.filterAttributes).forEach(function(attr) {
+    attrSelectors.selectAll(".filter")
+      .append("option")
+      .attr("value", attr)
+      .text(attributes.filterAttributes[attr]);
+  });
+
+  document.getElementById("attr-selector-clicker").addEventListener("click", function() {
+    var forms = document.getElementById("attrSelectorForms");
+    forms.className = forms.className === "hidden" ? "" : "hidden";
+  });
+
+  document.getElementById("filter-clicker").addEventListener("click", function() {
+    var filters = document.getElementById("filters");
+    filters.className = filters.className === "hidden" ? "" : "hidden";
+  });
 
   document.getElementById("attrSelectorForms").addEventListener("change", gatherAndReRender);
 
