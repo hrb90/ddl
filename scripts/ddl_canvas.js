@@ -10,6 +10,20 @@ function DDLCanvas(svgId) {
   this.tooltipFactory = null;
 }
 
+DDLCanvas.prototype.addAxes = function () {
+  if (this.dataDigest.xScale) {
+    var xAxis = d3.axisTop(this.dataDigest.xScale);
+    this.canvas.append('g')
+      .attr('transform', `translate(0, ${this.height() + 5})`)
+      .call(xAxis);
+  }
+  if (this.dataDigest.yScale) {
+    var yAxis = d3.axisRight(this.dataDigest.yScale);
+    this.canvas.append("g")
+      .attr("transform", "translate(-10, 0)")
+      .call(yAxis);
+  }
+};
 
 DDLCanvas.prototype.addFilter = function(filter) {
   this.filters.push(filter);
@@ -20,7 +34,8 @@ DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
 };
 
 DDLCanvas.prototype.clearCanvas = function () {
-  var elements = this.canvas.selectAll("circle").remove();
+  this.canvas.selectAll("circle").remove();
+  this.canvas.selectAll('g').remove();
 };
 
 DDLCanvas.prototype.clearFilters = function () {
@@ -37,10 +52,14 @@ DDLCanvas.prototype.filter = function (data) {
 
 DDLCanvas.prototype.getFactoryOptions = function () {
   return {
-    width: this.canvas.nodes()[0].width.baseVal.value,
-    height: this.canvas.nodes()[0].height.baseVal.value,
-    pinBounds: this.pinBounds,
+    width: this.width(),
+    height: this.height(),
+    pinBounds: this.pinBounds
   };
+};
+
+DDLCanvas.prototype.height = function () {
+  return this.canvas.nodes()[0].height.baseVal.value;
 };
 
 
@@ -51,17 +70,19 @@ DDLCanvas.prototype.pinBoundaries = function () {
 DDLCanvas.prototype.renderData = function (data) {
   var filteredData = this.filter(data);
   var appender = this.appenderFactory(filteredData, this.getFactoryOptions());
+  this.dataDigest = appender.dataDigest;
+  this.addAxes();
   var tooltipAppender, tooltip;
   if (this.tooltipFactory) {
     tooltip = d3.select('body').append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
-    tooltipAppender = this.tooltipFactory(filteredData, this.getFactoryOptions());
+    tooltipAppender = this.tooltipFactory(filteredData, this.getFactoryOptions()).appender;
   }
   var plot = this.canvas.selectAll(`#${this.svgId}`)
     .data(filteredData)
     .enter()
-    .append(appender);
+    .append(appender.appender);
   if (tooltipAppender) {
     plot.on("mouseover", function(d) {
       tooltip.transition().duration(200).style("opacity", 0.9);
@@ -86,6 +107,10 @@ DDLCanvas.prototype.setAppenderFactory = function (appenderFactory) {
 
 DDLCanvas.prototype.unpinBoundaries = function () {
   this.pinBounds = false;
+};
+
+DDLCanvas.prototype.width = function () {
+  return this.canvas.nodes()[0].width.baseVal.value;
 };
 
 module.exports = DDLCanvas;
