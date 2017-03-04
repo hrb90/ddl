@@ -5,7 +5,7 @@ function AppenderFactoryFactory(baseType = "g", subFactories = [], attrSetters =
   this.subFactories = subFactories;
   this.attrSetters = attrSetters;
   this.innerHTMLSetter = function () { return ""; };
-  this.precomputeDataOptions = function(data) { return data; };
+  this.precomputeDataOptions = function(data) { return {}; };
 }
 
 AppenderFactoryFactory.prototype.addAttributeSetter = function (attrName, setter) {

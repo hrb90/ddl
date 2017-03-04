@@ -66,8 +66,8 @@ DDLCanvas.prototype.renderData = function (data) {
     plot.on("mouseover", function(d) {
       tooltip.transition().duration(200).style("opacity", 0.9);
       tooltip.style("left", (d3.event.pageX) + "px")
-      .style("top", (d3.event.pageY - 28) + "px")
-      .style("color", "black");
+        .style("top", (d3.event.pageY - 28) + "px")
+        .style("color", "black");
       tooltip.html(tooltipAppender(d).outerHTML);
     })
     .on("mouseout", function() {
