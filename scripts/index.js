@@ -32,9 +32,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
   Object.keys(attributes.basicAttributes).forEach(function(attr) {
     attrSelectors.append("option")
+      .attr("class", attr)
       .attr("value", attr)
       .text(attributes.basicAttributes[attr]);
   });
+
+  d3.select("#attrX")
+    .select(".usgPct")
+    .attr("selected", true);
+
+  d3.select("#attrY")
+    .select(".astPct")
+    .attr("selected", true);
 
   Object.keys(attributes.filterAttributes).forEach(function(attr) {
     attrSelectors.selectAll(".filter")
