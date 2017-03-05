@@ -17,11 +17,21 @@ DDLCanvas.prototype.addAxes = function () {
       .attr('transform', `translate(0, ${this.height() + 5})`)
       .call(xAxis);
   }
+  if (this.dataDigest.xLabel) {
+    this.canvas.append('text')
+      .attr('transform', `translate(${this.width() / 2}, ${this.height() + 20})`)
+      .text(this.dataDigest.xLabel);
+  }
   if (this.dataDigest.yScale) {
     var yAxis = d3.axisRight(this.dataDigest.yScale);
     this.canvas.append("g")
       .attr("transform", "translate(-10, 0)")
       .call(yAxis);
+  }
+  if (this.dataDigest.yLabel) {
+    this.canvas.append('text')
+      .attr('transform', `translate(-14, ${this.height() / 2})rotate(270)`)
+      .text(this.dataDigest.yLabel);
   }
 };
 
@@ -36,6 +46,7 @@ DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
 DDLCanvas.prototype.clearCanvas = function () {
   this.canvas.selectAll("circle").remove();
   this.canvas.selectAll('g').remove();
+  this.canvas.selectAll('text').remove();
 };
 
 DDLCanvas.prototype.clearFilters = function () {

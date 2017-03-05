@@ -19,7 +19,9 @@ function makeCircleFactory(attrX, attrY,
     return {
       xScale: xScale,
       yScale: yScale,
-      avgRadius: avgRadius
+      avgRadius: avgRadius,
+      xLabel: attrX,
+      yLabel: attrY
     };
   });
   circleFactory.addAttributeSetter('cx',
