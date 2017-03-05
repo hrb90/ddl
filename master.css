@@ -1,0 +1,26 @@
+body {
+  background-color: #f8f8f8;
+}
+
+#chart {
+  padding: 30px;
+}
+
+.hidden {
+  display: none;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+ul {
+  list-style: none;
+}
