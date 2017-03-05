@@ -2,6 +2,7 @@ var d3 = require('d3');
 var AppenderFactoryFactory = require('./appender_factory_factory');
 var simpleAttrSetterFactory = require('./simple_attr_setter_factory');
 var colorPickers = require('./color_pickers.js');
+var attrs = require('../attrs');
 
 function makeCircleFactory(attrX, attrY,
           attrArea = "minutes",
@@ -20,8 +21,8 @@ function makeCircleFactory(attrX, attrY,
       xScale: xScale,
       yScale: yScale,
       avgRadius: avgRadius,
-      xLabel: attrX,
-      yLabel: attrY
+      xLabel: attrs.basicAttributes[attrX],
+      yLabel: attrs.basicAttributes[attrY]
     };
   });
   circleFactory.addAttributeSetter('cx',
