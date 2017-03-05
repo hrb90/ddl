@@ -11,28 +11,47 @@
     <div id="attribute-selectors">
       <span id="attr-selector-clicker">Select attributes to plot</span>
       <div id="attrSelectorForms" class="hidden">
-        <label for="#attrX">X axis</label>
-        <select class="attr-selector" id="attrX">
-        </select>
-        <label for="#attrY">Y axis</label>
-        <select class="attr-selector" id="attrY">
-        </select>
+        <ul>
+          <li>
+            <label for="#attrX">X axis</label>
+            <select class="attr-selector" id="attrX">
+            </select>
+          </li>
+          <li>
+            <label for="#attrY">Y axis</label>
+            <select class="attr-selector" id="attrY">
+            </select>
+          </li>
+        </ul>
       </div>
     </div>
     <div id="filter-container">
       <span id="filter-clicker">Filters</span>
       <div id="filters" class="hidden">
-        <label for="chkPG">PG</label>
-        <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
-        <label for="chkSG">SG</label>
-        <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
-        <label for="chkSF">SF</label>
-        <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
-        <label for="chkPF">PF</label>
-        <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
-        <label for="chkC">C</label>
-        <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+        <ul>
+          <li>
+            <label for="chkPG">PG</label>
+            <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
+          </li>
+          <li>
+            <label for="chkSG">SG</label>
+            <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
+          </li>
+          <li>
+            <label for="chkSF">SF</label>
+            <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
+          </li>
+          <li>
+            <label for="chkPF">PF</label>
+            <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
+          </li>
+          <li>
+            <label for="chkC">C</label>
+            <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+          </li>
+        </ul>
         <button id="new-filter-button">Add filter</button>
+        <div id="span-filter-container"></div>
       </div>
       <form id="new-filter-form" class="hidden">
         <select class="attr-selector filter" id="filter-attr">
