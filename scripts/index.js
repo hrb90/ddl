@@ -14,11 +14,14 @@ document.addEventListener("DOMContentLoaded", function() {
   canvas.addTooltips(TooltipFactories.makeBasicPlayerTooltipFactory());
   var attrXSelector = document.getElementById("attrX");
   var attrYSelector = document.getElementById("attrY");
+  var attrAreaSelector = document.getElementById("attrArea");
+
 
   function gatherAndReRender() {
     canvas.clearCanvas();
     canvas.clearFilters();
-    canvas.setAppenderFactory(makeCircleFactory(attrXSelector.value, attrYSelector.value));
+    canvas.setAppenderFactory(makeCircleFactory(attrXSelector.value,
+      attrYSelector.value, attrAreaSelector.value));
     var posFilters = document.getElementsByClassName('posFilter');
     var posList = [];
     [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
@@ -43,6 +46,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
   d3.select("#attrY")
     .select(".astPct")
+    .attr("selected", true);
+
+  d3.select("#attrArea")
+    .select(".minutes")
     .attr("selected", true);
 
   Object.keys(attributes.filterAttributes).forEach(function(attr) {
