@@ -7,7 +7,7 @@ body {
 }
 
 .hidden {
-  display: none;
+  display: none!important;
 }
 
 div.tooltip {
@@ -23,4 +23,34 @@ div.tooltip {
 
 ul {
   list-style: none;
+  padding: 0;
+}
+
+#filters {
+  display: flex;
+}
+
+#filters li {
+  display: flex;
+  justify-content: space-between;
+}
+
+#filters button {
+  align-self: center;
+  height: 40px;
+}
+
+#span-filter-container {
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  padding: 4px;
+  margin: 10px;
+}
+
+.span-filter {
+  background: lightsteelblue;
+  opacity: 0.9;
+  padding: 2px;
+  border-radius: 2px;
+  margin: 2px;
 }

@@ -64,11 +64,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
   document.getElementById("attrSelectorForms").addEventListener("change", gatherAndReRender);
 
-  document.getElementById("filters").append(makeFilterSpan("minutes", ">=", "400"));
+  document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
 
   document.getElementById("filters").addEventListener("change", gatherAndReRender);
 
-  document.getElementById("filters").addEventListener("click", function(e) {
+  document.getElementById("span-filter-container").addEventListener("click", function(e) {
     if (e.target.className === "span-filter") {
      e.target.remove();
      gatherAndReRender();
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var thresholdEl = document.getElementById("threshold");
     var threshold = thresholdEl.value;
     thresholdEl.value = "";
-    document.getElementById("filters").append(makeFilterSpan(attrName, comp, threshold));
+    document.getElementById("span-filter-container").append(makeFilterSpan(attrName, comp, threshold));
     e.currentTarget.className = "hidden";
     gatherAndReRender();
   });
