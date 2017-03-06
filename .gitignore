@@ -5,6 +5,5 @@
 # Ignore node packages
 node_modules/*
 
-# Ignore bundle
-bundle.js
+# Ignore source map
 bundle.js.map
