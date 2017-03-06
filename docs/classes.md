@@ -1,5 +1,17 @@
 # Classes
 
+## Gatherer
+
+Collects and preprocesses data about what we want to render from user inputs on the DOM
+
+### scales
+
+### pinBoundaries()
+
+### unpinBoundaries()
+
+Self-explanatory.
+
 ## DDLCanvas
 
 Wrapper around the svg element that D3 renders onto.
@@ -19,18 +31,6 @@ A function that takes in dimensions and returns a function that takes (dataPoint
 ### clearCanvas()
 
 Clears the canvas.
-
-### includeOutliers()
-
-### excludeOutliers()
-
-### pinBoundaries()
-
-Don't recompute boundaries on renderData()
-
-### unpinBoundaries()
-
-Obvious.
 
 ### renderData(data)
 
