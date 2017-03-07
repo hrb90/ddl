@@ -35,10 +35,6 @@ DDLCanvas.prototype.addAxes = function () {
   }
 };
 
-DDLCanvas.prototype.addFilter = function(filter) {
-  this.filters.push(filter);
-};
-
 DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
   this.tooltipFactory = tooltipFactory;
 };
@@ -49,17 +45,6 @@ DDLCanvas.prototype.clearCanvas = function () {
   this.canvas.selectAll('text').remove();
 };
 
-DDLCanvas.prototype.clearFilters = function () {
-  this.filters = [];
-};
-
-
-DDLCanvas.prototype.filter = function (data) {
-  var that = this;
-  return data.filter(function(d) {
-    return that.filters.every(function(f) { return f(d); } );
-  });
-};
 
 DDLCanvas.prototype.getFactoryOptions = function () {
   return {
