@@ -16,6 +16,7 @@ function Gatherer(factories, canvas, domElements) {
 Gatherer.prototype.addListeners = function () {
   var render = this.render;
   [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", render); });
+  this.filterContainer.addEventListener("change", render);
   this.newFilterForm.addEventListener("submit", function(e) {
     e.preventDefault();
     var attrName = document.getElementById("filter-attr").value;

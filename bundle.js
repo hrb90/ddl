@@ -26127,10 +26127,10 @@ function makeCircleFactory(attrs,
   var attrArea = attrs.attrArea;
   var circleFactory = new AppenderFactoryFactory("circle");
   circleFactory.setDataPrecomputer(function(data, options) {
-    var xScale = d3.scaleLinear()
+    var xScale = options.xScale || d3.scaleLinear()
                 .domain(d3.extent(data.map(function(d) { return d[attrX]; })))
                 .range([10, options.width - 10]);
-    var yScale = d3.scaleLinear()
+    var yScale = options.yScale || d3.scaleLinear()
                 .domain(d3.extent(data.map(function(d) { return d[attrY]; })))
                 .range([options.height - 10, 10]);
     var avgRadius = d3.mean(data.map(function(d) { return Math.sqrt(d[attrArea]); }));
@@ -26319,6 +26319,7 @@ function Gatherer(factories, canvas, domElements) {
 Gatherer.prototype.addListeners = function () {
   var render = this.render;
   [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", render); });
+  this.filterContainer.addEventListener("change", render);
   this.newFilterForm.addEventListener("submit", function(e) {
     e.preventDefault();
     var attrName = document.getElementById("filter-attr").value;
@@ -26475,6 +26476,11 @@ function addClickers() {
     var filters = document.getElementById("filters");
     filters.className = filters.className === "hidden" ? "" : "hidden";
   });
+
+  document.getElementById("new-filter-button").addEventListener("click", function(e) {
+    document.getElementById("new-filter-form").className = "";
+  });
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -26489,10 +26495,10 @@ document.addEventListener('DOMContentLoaded', function () {
     filterContainer: document.getElementById('filters'),
     newFilterForm: document.getElementById('new-filter-form')
   });
-  gatherer.setData(nbaData);
-  gatherer.render();
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
+  gatherer.setData(nbaData);
+  gatherer.render();
 });
 
 

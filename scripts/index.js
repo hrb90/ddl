@@ -45,6 +45,11 @@ function addClickers() {
     var filters = document.getElementById("filters");
     filters.className = filters.className === "hidden" ? "" : "hidden";
   });
+
+  document.getElementById("new-filter-button").addEventListener("click", function(e) {
+    document.getElementById("new-filter-form").className = "";
+  });
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -59,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
     filterContainer: document.getElementById('filters'),
     newFilterForm: document.getElementById('new-filter-form')
   });
-  gatherer.setData(nbaData);
-  gatherer.render();
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
+  gatherer.setData(nbaData);
+  gatherer.render();
 });

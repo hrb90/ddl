@@ -12,10 +12,10 @@ function makeCircleFactory(attrs,
   var attrArea = attrs.attrArea;
   var circleFactory = new AppenderFactoryFactory("circle");
   circleFactory.setDataPrecomputer(function(data, options) {
-    var xScale = d3.scaleLinear()
+    var xScale = options.xScale || d3.scaleLinear()
                 .domain(d3.extent(data.map(function(d) { return d[attrX]; })))
                 .range([10, options.width - 10]);
-    var yScale = d3.scaleLinear()
+    var yScale = options.yScale || d3.scaleLinear()
                 .domain(d3.extent(data.map(function(d) { return d[attrY]; })))
                 .range([options.height - 10, 10]);
     var avgRadius = d3.mean(data.map(function(d) { return Math.sqrt(d[attrArea]); }));
