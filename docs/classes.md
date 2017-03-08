@@ -6,6 +6,8 @@ Collects and preprocesses data about what we want to render from user inputs on 
 
 ### scales
 
+### filters
+
 ### pinBoundaries()
 
 ### unpinBoundaries()

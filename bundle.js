@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -16639,6 +16639,60 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+var basicAttributes = {
+  tsPct: "TS%",
+  astPct: "AST%",
+  oRbPct: "ORB%",
+  tRbPct: "TRB%",
+  stlPct: "STL%",
+  blkPct: "BLK%",
+  usgPct: "USG%",
+  tovPct: "TOV%",
+  obpm: "OBPM",
+  dbpm: "DBPM",
+  bpm: "BPM",
+  minutes: "Minutes"
+};
+
+var filterAttributes = {
+  age: "Age"
+};
+
+module.exports = {
+  basicAttributes: basicAttributes,
+  filterAttributes: filterAttributes 
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+function makeFilterSpan(attrName, comparator, threshold) {
+  var filterSpan = document.createElement("span");
+  filterSpan.className = "span-filter";
+  filterSpan.innerText = `${attrName} ${comparator} ${threshold}`;
+  filterSpan.data = { filter: function (d) {
+      switch(comparator) {
+        case "<=":
+          return d[attrName] <= (+threshold);
+        case "=":
+          return d[attrName] === (+threshold);
+        case ">=":
+          return d[attrName] >= (+threshold);
+      }
+    }
+  };
+  return filterSpan;
+}
+
+module.exports = makeFilterSpan;
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -16709,7 +16763,7 @@ module.exports = AppenderFactoryFactory;
 
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = [
@@ -26056,19 +26110,21 @@ module.exports = [
 ];
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var AppenderFactoryFactory = __webpack_require__(1);
-var simpleAttrSetterFactory = __webpack_require__(8);
-var colorPickers = __webpack_require__(7);
-var attrs = __webpack_require__(10);
+var AppenderFactoryFactory = __webpack_require__(3);
+var simpleAttrSetterFactory = __webpack_require__(10);
+var colorPickers = __webpack_require__(9);
+var attrMap = __webpack_require__(1);
 
-function makeCircleFactory(attrX, attrY,
-          attrArea = "minutes",
+function makeCircleFactory(attrs,
           baseRadius = 10,
           colorPicker = colorPickers.positionPicker) {
+  var attrX = attrs.attrX;
+  var attrY = attrs.attrY;
+  var attrArea = attrs.attrArea;
   var circleFactory = new AppenderFactoryFactory("circle");
   circleFactory.setDataPrecomputer(function(data, options) {
     var xScale = d3.scaleLinear()
@@ -26082,8 +26138,8 @@ function makeCircleFactory(attrX, attrY,
       xScale: xScale,
       yScale: yScale,
       avgRadius: avgRadius,
-      xLabel: attrs.basicAttributes[attrX],
-      yLabel: attrs.basicAttributes[attrY]
+      xLabel: attrMap.basicAttributes[attrX],
+      yLabel: attrMap.basicAttributes[attrY]
     };
   });
   circleFactory.addAttributeSetter('cx',
@@ -26107,10 +26163,10 @@ module.exports = makeCircleFactory;
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var AppenderFactoryFactory = __webpack_require__(1);
+var AppenderFactoryFactory = __webpack_require__(3);
 
 function makeTooltipFactory(attrName) {
   var tooltipFactory = new AppenderFactoryFactory('div');
@@ -26134,7 +26190,7 @@ module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };
 
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -26174,10 +26230,6 @@ DDLCanvas.prototype.addAxes = function () {
   }
 };
 
-DDLCanvas.prototype.addFilter = function(filter) {
-  this.filters.push(filter);
-};
-
 DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
   this.tooltipFactory = tooltipFactory;
 };
@@ -26188,17 +26240,6 @@ DDLCanvas.prototype.clearCanvas = function () {
   this.canvas.selectAll('text').remove();
 };
 
-DDLCanvas.prototype.clearFilters = function () {
-  this.filters = [];
-};
-
-
-DDLCanvas.prototype.filter = function (data) {
-  var that = this;
-  return data.filter(function(d) {
-    return that.filters.every(function(f) { return f(d); } );
-  });
-};
 
 DDLCanvas.prototype.getFactoryOptions = function () {
   return {
@@ -26212,14 +26253,8 @@ DDLCanvas.prototype.height = function () {
   return this.canvas.nodes()[0].height.baseVal.value;
 };
 
-
-DDLCanvas.prototype.pinBoundaries = function () {
-  this.pinBounds = true;
-};
-
 DDLCanvas.prototype.renderData = function (data) {
-  var filteredData = this.filter(data);
-  var appender = this.appenderFactory(filteredData, this.getFactoryOptions());
+  var appender = this.appenderFactory(data, this.getFactoryOptions());
   this.dataDigest = appender.dataDigest;
   this.addAxes();
   var tooltipAppender, tooltip;
@@ -26227,10 +26262,10 @@ DDLCanvas.prototype.renderData = function (data) {
     tooltip = d3.select('body').append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
-    tooltipAppender = this.tooltipFactory(filteredData, this.getFactoryOptions()).appender;
+    tooltipAppender = this.tooltipFactory(data, this.getFactoryOptions()).appender;
   }
   var plot = this.canvas.selectAll(`#${this.svgId}`)
-    .data(filteredData)
+    .data(data)
     .enter()
     .append(appender.appender);
   if (tooltipAppender) {
@@ -26255,10 +26290,6 @@ DDLCanvas.prototype.setAppenderFactory = function (appenderFactory) {
   this.appenderFactory = appenderFactory;
 };
 
-DDLCanvas.prototype.unpinBoundaries = function () {
-  this.pinBounds = false;
-};
-
 DDLCanvas.prototype.width = function () {
   return this.canvas.nodes()[0].width.baseVal.value;
 };
@@ -26267,32 +26298,99 @@ module.exports = DDLCanvas;
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports) {
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
 
-function makeFilterSpan(attrName, comparator, threshold) {
-  var filterSpan = document.createElement("span");
-  filterSpan.className = "span-filter";
-  filterSpan.innerText = `${attrName} ${comparator} ${threshold}`;
-  filterSpan.data = { filter: function (d) {
-      switch(comparator) {
-        case "<=":
-          return d[attrName] <= (+threshold);
-        case "=":
-          return d[attrName] === (+threshold);
-        case ">=":
-          return d[attrName] >= (+threshold);
-      }
-    }
-  };
-  return filterSpan;
+var d3 = __webpack_require__(0);
+var makeFilterSpan = __webpack_require__(2);
+
+function Gatherer(factories, canvas, domElements) {
+  this.factories = factories;
+  this.canvas = canvas;
+  this.attrSelectors = domElements.attrSelectors;
+  this.filterContainer = domElements.filterContainer;
+  this.newFilterForm = domElements.newFilterForm;
+  this.render = this.render.bind(this);
+  this.filters = [];
+  this.data = [];
+  this.addListeners();
 }
 
-module.exports = makeFilterSpan;
+Gatherer.prototype.addListeners = function () {
+  var render = this.render;
+  [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", render); });
+  this.newFilterForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    var attrName = document.getElementById("filter-attr").value;
+    var comp = document.getElementById("comparator").value;
+    var thresholdEl = document.getElementById("threshold");
+    var threshold = thresholdEl.value;
+    thresholdEl.value = "";
+    document.getElementById("span-filter-container").append(makeFilterSpan(attrName, comp, threshold));
+    e.currentTarget.className = "hidden";
+    render();
+  });
+  this.filterContainer.addEventListener("click", function(e) {
+    if (e.target.className === "span-filter") {
+      e.target.remove();
+      render();
+    }
+  });
+};
+
+
+Gatherer.prototype.filter = function (data) {
+  var that = this;
+  return data.filter(function(d) {
+    return that.filters.every(function(f) { return f(d); } );
+  });
+};
+
+Gatherer.prototype.gatherAttributeSelectors = function () {
+  var selections = {};
+  [].forEach.call(this.attrSelectors, function (selector) {
+    selections[selector.id] = selector.value;
+  });
+  return selections;
+};
+
+Gatherer.prototype.gatherFilters = function () {
+  var posFilters = document.getElementsByClassName('posFilter');
+  var posList = [];
+  [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
+  var filterList = [ function(d) { return posList.includes(d.position); } ];
+  var spanFilters = document.getElementsByClassName('span-filter');
+  [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
+  this.filters = filterList;
+};
+
+Gatherer.prototype.makeFactories = function (selectors) {
+  var factories = {};
+  var that = this;
+  Object.keys(this.factories).forEach(function(id) {
+    factories[id] = that.factories[id](selectors);
+  });
+  return factories;
+};
+
+Gatherer.prototype.render = function () {
+  this.canvas.clearCanvas();
+  this.gatherFilters();
+  var factories = this.makeFactories(this.gatherAttributeSelectors());
+  this.canvas.setAppenderFactory(factories.main);
+  this.canvas.addTooltips(factories.tooltip);
+  this.canvas.renderData(this.filter(this.data));
+};
+
+Gatherer.prototype.setData = function(data) {
+  this.data = data;
+};
+
+module.exports = Gatherer;
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports) {
 
 var positionPicker = function(player) {
@@ -26314,7 +26412,7 @@ module.exports = { positionPicker }
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports) {
 
 function simpleAttrSetterFactory(propName, propTransform) {
@@ -26327,46 +26425,21 @@ module.exports = simpleAttrSetterFactory;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var DDLCanvas = __webpack_require__(5);
-var makeCircleFactory = __webpack_require__(3);
-var TooltipFactories = __webpack_require__(4);
-var makeFilterSpan = __webpack_require__(6);
-var attributes = __webpack_require__(10);
-var nbaData = __webpack_require__(2);
+var DDLCanvas = __webpack_require__(7);
+var makeCircleFactory = __webpack_require__(5);
+var TooltipFactories = __webpack_require__(6);
+var Gatherer = __webpack_require__(8);
+var makeFilterSpan = __webpack_require__(2);
+var attributes = __webpack_require__(1);
+var nbaData = __webpack_require__(4);
 
-
-document.addEventListener("DOMContentLoaded", function() {
-  window.d3 = d3;
-
-  var canvas = new DDLCanvas("chart");
-  canvas.addTooltips(TooltipFactories.makeBasicPlayerTooltipFactory());
-  var attrXSelector = document.getElementById("attrX");
-  var attrYSelector = document.getElementById("attrY");
-  var attrAreaSelector = document.getElementById("attrArea");
-
-
-  function gatherAndReRender() {
-    canvas.clearCanvas();
-    canvas.clearFilters();
-    canvas.setAppenderFactory(makeCircleFactory(attrXSelector.value,
-      attrYSelector.value, attrAreaSelector.value));
-    var posFilters = document.getElementsByClassName('posFilter');
-    var posList = [];
-    [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
-    canvas.addFilter(function(d) { return posList.includes(d.position); });
-    var spanFilters = document.getElementsByClassName('span-filter');
-    [].forEach.call(spanFilters, function(el) { canvas.addFilter(el.data.filter); });
-    canvas.renderData(nbaData);
-  }
-
-  var attrSelectors = d3.selectAll('.attr-selector');
-
+function populateSelectors(selectors) {
   Object.keys(attributes.basicAttributes).forEach(function(attr) {
-    attrSelectors.append("option")
+    selectors.append("option")
       .attr("class", attr)
       .attr("value", attr)
       .text(attributes.basicAttributes[attr]);
@@ -26385,12 +26458,14 @@ document.addEventListener("DOMContentLoaded", function() {
     .attr("selected", true);
 
   Object.keys(attributes.filterAttributes).forEach(function(attr) {
-    attrSelectors.selectAll(".filter")
+    selectors.selectAll(".filter")
       .append("option")
       .attr("value", attr)
       .text(attributes.filterAttributes[attr]);
   });
+}
 
+function addClickers() {
   document.getElementById("attr-selector-clicker").addEventListener("click", function() {
     var forms = document.getElementById("attrSelectorForms");
     forms.className = forms.className === "hidden" ? "" : "hidden";
@@ -26400,67 +26475,25 @@ document.addEventListener("DOMContentLoaded", function() {
     var filters = document.getElementById("filters");
     filters.className = filters.className === "hidden" ? "" : "hidden";
   });
+}
 
-  document.getElementById("attrSelectorForms").addEventListener("change", gatherAndReRender);
-
+document.addEventListener('DOMContentLoaded', function () {
+  var canvas = new DDLCanvas("chart");
+  var attrSelectors = d3.selectAll('.attr-selector');
+  populateSelectors(attrSelectors);
+  var gatherer = new Gatherer({
+    main: makeCircleFactory,
+    tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
+  }, canvas, {
+    attrSelectors: document.getElementsByClassName('attr-selector'),
+    filterContainer: document.getElementById('filters'),
+    newFilterForm: document.getElementById('new-filter-form')
+  });
+  gatherer.setData(nbaData);
+  gatherer.render();
+  addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
-
-  document.getElementById("filters").addEventListener("change", gatherAndReRender);
-
-  document.getElementById("span-filter-container").addEventListener("click", function(e) {
-    if (e.target.className === "span-filter") {
-     e.target.remove();
-     gatherAndReRender();
-    }
-  });
-
-  document.getElementById("new-filter-button").addEventListener("click", function(e) {
-    document.getElementById("new-filter-form").className = "";
-  });
-
-  document.getElementById("new-filter-form").addEventListener("submit", function(e) {
-    e.preventDefault();
-    var attrName = document.getElementById("filter-attr").value;
-    var comp = document.getElementById("comparator").value;
-    var thresholdEl = document.getElementById("threshold");
-    var threshold = thresholdEl.value;
-    thresholdEl.value = "";
-    document.getElementById("span-filter-container").append(makeFilterSpan(attrName, comp, threshold));
-    e.currentTarget.className = "hidden";
-    gatherAndReRender();
-  });
-
-  gatherAndReRender();
 });
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-var basicAttributes = {
-  tsPct: "TS%",
-  astPct: "AST%",
-  oRbPct: "ORB%",
-  tRbPct: "TRB%",
-  stlPct: "STL%",
-  blkPct: "BLK%",
-  usgPct: "USG%",
-  tovPct: "TOV%",
-  obpm: "OBPM",
-  dbpm: "DBPM",
-  bpm: "BPM",
-  minutes: "Minutes"
-};
-
-var filterAttributes = {
-  age: "Age"
-};
-
-module.exports = {
-  basicAttributes: basicAttributes,
-  filterAttributes: filterAttributes 
-};
 
 
 /***/ })

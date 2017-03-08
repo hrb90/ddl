@@ -58,14 +58,8 @@ DDLCanvas.prototype.height = function () {
   return this.canvas.nodes()[0].height.baseVal.value;
 };
 
-
-DDLCanvas.prototype.pinBoundaries = function () {
-  this.pinBounds = true;
-};
-
 DDLCanvas.prototype.renderData = function (data) {
-  var filteredData = this.filter(data);
-  var appender = this.appenderFactory(filteredData, this.getFactoryOptions());
+  var appender = this.appenderFactory(data, this.getFactoryOptions());
   this.dataDigest = appender.dataDigest;
   this.addAxes();
   var tooltipAppender, tooltip;
@@ -73,10 +67,10 @@ DDLCanvas.prototype.renderData = function (data) {
     tooltip = d3.select('body').append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
-    tooltipAppender = this.tooltipFactory(filteredData, this.getFactoryOptions()).appender;
+    tooltipAppender = this.tooltipFactory(data, this.getFactoryOptions()).appender;
   }
   var plot = this.canvas.selectAll(`#${this.svgId}`)
-    .data(filteredData)
+    .data(data)
     .enter()
     .append(appender.appender);
   if (tooltipAppender) {
@@ -99,10 +93,6 @@ DDLCanvas.prototype.removeTooltips = function () {
 
 DDLCanvas.prototype.setAppenderFactory = function (appenderFactory) {
   this.appenderFactory = appenderFactory;
-};
-
-DDLCanvas.prototype.unpinBoundaries = function () {
-  this.pinBounds = false;
 };
 
 DDLCanvas.prototype.width = function () {
