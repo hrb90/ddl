@@ -50,7 +50,7 @@ end
 
 anuhliticks = []
 
-(2015..2017).to_a.each do |year|
+(1980..2017).to_a.each do |year|
   players = {};
   ['ADV', 'PG'].each do |type|
     File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
