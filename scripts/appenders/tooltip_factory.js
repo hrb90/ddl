@@ -12,8 +12,8 @@ function makeBasicPlayerTooltipFactory() {
   var basicPlayerTooltipFactory = new AppenderFactoryFactory('div');
   basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
     return `<h4>${playerSeason.name}</h4>
-            <p>${playerSeason.team}</p>
-            <p>${playerSeason.position}</p>`;
+            <p>${playerSeason.team} ${playerSeason.position}</p>
+            <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
   });
   return basicPlayerTooltipFactory.toFactory();
 }

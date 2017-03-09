@@ -13,4 +13,4 @@ var positionPicker = function(player) {
   }
 };
 
-module.exports = { positionPicker }
+module.exports = { positionPicker };

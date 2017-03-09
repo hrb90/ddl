@@ -36,6 +36,7 @@ function makeCircleFactory(attrs,
       return baseRadius * ( Math.sqrt(a) / dataOptions.avgRadius );
     })
   );
+  var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',
   simpleAttrSetterFactory("playerId", function(x) { return x; }));
