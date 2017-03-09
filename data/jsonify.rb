@@ -2,7 +2,7 @@ require 'json'
 require 'csv'
 require 'byebug'
 
-def transform_player_season(row)
+def transform_player_adv(row)
   row = row.to_hash
   new_row = {}
   # Extract player ID
@@ -28,12 +28,46 @@ def transform_player_season(row)
   new_row
 end
 
-# Get the data from the csvs
-File.open('./csvs/2017_ADV.csv', 'r') do |datafile|
-  adv_csv = CSV.new(datafile, headers: true)
-  anuhliticks = adv_csv.to_a.map { |row| transform_player_season(row) } # They're bullcrap, Erneh.
+def transform_player_pg(row)
+  row = row.to_hash
+  new_row = {}
+  new_row["playerId"] = row["Player"].split("\\")[1]
+  new_row["games"] = row["G"].to_i
+  new_row["fgPct"] = row["FG%"].to_f
+  new_row["threePct"] = row["3P%"].to_f
+  new_row["ftPct"] = row["FT%"].to_f
+  new_row["orbPg"] = row["ORB"].to_f
+  new_row["drbPg"] = row["DRB"].to_f
+  new_row["trbPg"] = row["TRB"].to_f
+  new_row["astPg"] = row["AST"].to_f
+  new_row["stlPg"] = row["STL"].to_f
+  new_row["blkPg"] = row["BLK"].to_f
+  new_row["tovPg"] = row["TOV"].to_f
+  new_row["ptsPg"] = row["PS/G"].to_f
+  new_row
+end
 
-  File.open('./all_data.json', 'w') do |f|
-    f.puts(anuhliticks.to_json)
+anuhliticks = []
+
+(2015..2017).to_a.each do |year|
+  players = {};
+  ['ADV', 'PG'].each do |type|
+    File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
+      csv = CSV.new(datafile, headers: true)
+      csv.to_a.each do |row|
+        if type == 'ADV'
+          data = transform_player_adv(row)
+          players[data["playerId"]] = data.merge({season: year})
+        else
+          data = transform_player_pg(row)
+          players[data["playerId"]] = players[data["playerId"]].merge(data)
+        end
+      end
+    end
   end
+  anuhliticks += players.values
+end
+
+File.open('./all_data.json', 'w') do |f|
+  f.puts(anuhliticks.to_json)
 end
