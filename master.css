@@ -1,6 +1,9 @@
 body {
-  display: flex;
   background-color: #f8f8f8;
+}
+
+#main {
+  display: flex;
 }
 
 #chart {
@@ -74,4 +77,5 @@ ul {
   display: inline;
   position: relative;
   bottom: 600px;
+  right: 30px;
 }

@@ -9,69 +9,74 @@
     <title>Data Don't Lie</title>
   </head>
   <body>
-    <aside id="attrSelectorForms" class="hidden">
-      <ul>
-        <li>
-          <label for="#attrX">X axis</label>
-          <select class="attr-selector" id="attrX">
-          </select>
-        </li>
-        <li>
-          <label for="#attrY">Y axis</label>
-          <select class="attr-selector" id="attrY">
-          </select>
-        </li>
-        <li>
-          <label for="#attrArea">Area</label>
-          <select class="attr-selector" id="attrArea">
-          </select>
-        </li>
-      </ul>
-    </aside>
-    <aside id="filter-container">
-      <div id="filters" class="hidden">
+    <header>
+      <h1>Data Don't Lie</h1>
+    </header>
+    <div id="main">
+      <aside id="attrSelectorForms" class="hidden">
         <ul>
           <li>
-            <label for="chkPG">PG</label>
-            <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
+            <label for="#attrX">X axis</label>
+            <select class="attr-selector" id="attrX">
+            </select>
           </li>
           <li>
-            <label for="chkSG">SG</label>
-            <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
+            <label for="#attrY">Y axis</label>
+            <select class="attr-selector" id="attrY">
+            </select>
           </li>
           <li>
-            <label for="chkSF">SF</label>
-            <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
-          </li>
-          <li>
-            <label for="chkPF">PF</label>
-            <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
-          </li>
-          <li>
-            <label for="chkC">C</label>
-            <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+            <label for="#attrArea">Area</label>
+            <select class="attr-selector" id="attrArea">
+            </select>
           </li>
         </ul>
-        <button id="new-filter-button">Add filter</button>
-        <div id="span-filter-container"></div>
+      </aside>
+      <aside id="filter-container">
+        <div id="filters" class="hidden">
+          <ul>
+            <li>
+              <label for="chkPG">PG</label>
+              <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
+            </li>
+            <li>
+              <label for="chkSG">SG</label>
+              <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
+            </li>
+            <li>
+              <label for="chkSF">SF</label>
+              <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
+            </li>
+            <li>
+              <label for="chkPF">PF</label>
+              <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
+            </li>
+            <li>
+              <label for="chkC">C</label>
+              <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+            </li>
+          </ul>
+          <button id="new-filter-button">Add filter</button>
+          <div id="span-filter-container"></div>
+        </div>
+        <form id="new-filter-form" class="hidden">
+          <select class="attr-selector filter" id="filter-attr">
+          </select>
+          <select id="comparator">
+            <option value="<="><=</option>
+            <option value="=">=</option>
+            <option value=">=">>=</option>
+          </select>
+          <input type="text" id="threshold">
+          <input type="Submit" value="Add Filter">
+        </form>
+      </aside>
+      <div id="chart-wrapper">
+        <svg id="chart" width="1170" height="570">
+        </svg>
+        <i class="fa fa-bar-chart" aria-hidden="true" id="attr-selector-clicker"></i>
+        <i class="fa fa-filter" aria-hidden="true" id="filter-clicker"></i>
       </div>
-      <form id="new-filter-form" class="hidden">
-        <select class="attr-selector filter" id="filter-attr">
-        </select>
-        <select id="comparator">
-          <option value="<="><=</option>
-          <option value="=">=</option>
-          <option value=">=">>=</option>
-        </select>
-        <input type="text" id="threshold">
-        <input type="Submit" value="Add Filter">
-      </form>
-    </aside>
-    <div id="chart-wrapper">
-      <svg id="chart" width="1170" height="570">
-      </svg>
-      <i class="fa fa-bar-chart" aria-hidden="true" id="attr-selector-clicker"></i>
-      <i class="fa fa-filter" aria-hidden="true" id="filter-clicker"></i>
     </div>
   </body>
 </html>
