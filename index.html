@@ -3,35 +3,32 @@
   <head>
     <meta charset="utf-8">
     <script src="./bundle.js" charset="utf-8"></script>
+    <script src="https://use.fontawesome.com/c21ff7d00f.js"></script>
     <script type="text/javascript" src="./data/all_data.json"></script>
     <link rel="stylesheet" href="./master.css">
     <title>Data Don't Lie</title>
   </head>
   <body>
-    <div id="attribute-selectors">
-      <span id="attr-selector-clicker">Select attributes to plot</span>
-      <div id="attrSelectorForms" class="hidden">
-        <ul>
-          <li>
-            <label for="#attrX">X axis</label>
-            <select class="attr-selector" id="attrX">
-            </select>
-          </li>
-          <li>
-            <label for="#attrY">Y axis</label>
-            <select class="attr-selector" id="attrY">
-            </select>
-          </li>
-          <li>
-            <label for="#attrArea">Area</label>
-            <select class="attr-selector" id="attrArea">
-            </select>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div id="filter-container">
-      <span id="filter-clicker">Filters</span>
+    <aside id="attrSelectorForms" class="hidden">
+      <ul>
+        <li>
+          <label for="#attrX">X axis</label>
+          <select class="attr-selector" id="attrX">
+          </select>
+        </li>
+        <li>
+          <label for="#attrY">Y axis</label>
+          <select class="attr-selector" id="attrY">
+          </select>
+        </li>
+        <li>
+          <label for="#attrArea">Area</label>
+          <select class="attr-selector" id="attrArea">
+          </select>
+        </li>
+      </ul>
+    </aside>
+    <aside id="filter-container">
       <div id="filters" class="hidden">
         <ul>
           <li>
@@ -69,8 +66,12 @@
         <input type="text" id="threshold">
         <input type="Submit" value="Add Filter">
       </form>
+    </aside>
+    <div id="chart-wrapper">
+      <svg id="chart" width="1170" height="570">
+      </svg>
+      <i class="fa fa-bar-chart" aria-hidden="true" id="attr-selector-clicker"></i>
+      <i class="fa fa-filter" aria-hidden="true" id="filter-clicker"></i>
     </div>
-    <svg id="chart" width="1170" height="570">
-    </svg>
   </body>
 </html>

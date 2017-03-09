@@ -1,9 +1,12 @@
 body {
+  display: flex;
   background-color: #f8f8f8;
 }
 
 #chart {
   padding: 30px;
+  width: 1170px;
+  height: 570px;
 }
 
 .hidden {
@@ -28,6 +31,12 @@ ul {
 
 #filters {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#filters ul {
+  width: 50px;
 }
 
 #filters li {
@@ -36,15 +45,11 @@ ul {
 }
 
 #filters button {
-  align-self: center;
   height: 40px;
 }
 
 #span-filter-container {
-  border: 1px solid lightgrey;
-  border-radius: 5px;
-  padding: 4px;
-  margin: 10px;
+  margin: 12px;
 }
 
 .span-filter {
@@ -53,4 +58,20 @@ ul {
   padding: 2px;
   border-radius: 2px;
   margin: 2px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#chart-wrapper i {
+  display: none;
+  font-size: 20px;
+  padding: 3px;
+  border: 1px solid lightgrey;
+  cursor: pointer;
+}
+
+#chart-wrapper:hover i {
+  display: inline;
+  position: relative;
+  bottom: 600px;
 }
