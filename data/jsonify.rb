@@ -13,6 +13,7 @@ def transform_player_adv(row)
   # Only take primary position
   new_row["position"] = row["Pos"].split("-")[0]
   new_row["minutes"] = row["MP"].to_i
+  new_row["threeRate"] = row["3PAr"].to_f
   new_row["tsPct"] = row["TS%"].to_f
   new_row["oRbPct"] = row["ORB%"].to_f
   new_row["dRbPct"] = row["DRB%"].to_f
