@@ -57,6 +57,10 @@ Gatherer.prototype.gatherFilters = function () {
   var posList = [];
   [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
   var filterList = [ function(d) { return posList.includes(d.position); } ];
+  var minYearFilter = document.getElementById('start-season-selector');
+  var maxYearFilter = document.getElementById('end-season-selector');
+  filterList.push(function(d) { return d.season >= parseInt(minYearFilter.value); });
+  filterList.push(function(d) { return d.season <= parseInt(maxYearFilter.value); });
   var spanFilters = document.getElementsByClassName('span-filter');
   [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
   this.filters = filterList;
