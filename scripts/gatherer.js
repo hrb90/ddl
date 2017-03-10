@@ -8,6 +8,7 @@ function Gatherer(factories, canvas, domElements) {
   this.attrSelectors = domElements.attrSelectors;
   this.filterContainer = domElements.filterContainer;
   this.newFilterForm = domElements.newFilterForm;
+  this.highlightInput = domElements.highlightInput;
   this.render = this.render.bind(this);
   this.filters = [];
   this.data = [];
@@ -38,6 +39,11 @@ Gatherer.prototype.addListeners = function () {
   this.filterContainer.addEventListener("click", function(e) {
     if (e.target.className === "span-filter") {
       e.target.remove();
+      render();
+    }
+  });
+  this.highlightInput.addEventListener("change", function(e) {
+    if (e.currentTarget.value.length >= 3) {
       render();
     }
   });
@@ -73,11 +79,21 @@ Gatherer.prototype.gatherFilters = function () {
   this.filters = filterList;
 };
 
+Gatherer.prototype.getHighlight = function () {
+  var highlightName = this.highlightInput.value;
+  if (highlightName.length < 3) {
+    return function(name) { return false; };
+  } else {
+    return function(name) { return name.includes(highlightName); };
+  }
+};
+
 Gatherer.prototype.makeFactories = function (selectors) {
+  var attrHighlight = "name";
   var factories = {};
   var that = this;
   Object.keys(this.factories).forEach(function(id) {
-    factories[id] = that.factories[id](selectors, "name");
+    factories[id] = that.factories[id](selectors, attrHighlight);
   });
   return factories;
 };
@@ -99,7 +115,11 @@ Gatherer.prototype.makeOptions = function (data) {
     x: attrs.basicAttributes[attrSelectors.attrX],
     y: attrs.basicAttributes[attrSelectors.attrY]
   };
-  this.renderOptions = { scales: scales, labels: labels };
+  this.renderOptions = {
+    scales: scales,
+    labels: labels,
+    highlight: this.getHighlight()
+  };
 };
 
 Gatherer.prototype.pinBounds = function() {
@@ -112,9 +132,16 @@ Gatherer.prototype.render = function () {
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setAppenderFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
-  var filteredData = this.filter(this.data);
+  var filteredData = this.reorderData(this.filter(this.data), this.getHighlight());
   this.makeOptions(filteredData);
   this.canvas.renderData(filteredData, this.renderOptions);
+};
+
+Gatherer.prototype.reorderData = function(data, highlight) {
+  var attrHighlight = "name";
+  var unhilit = data.filter(function(d) { return !highlight(d[attrHighlight]); });
+  var hilit = data.filter(function(d) { return highlight(d[attrHighlight]); });
+  return unhilit.concat(hilit);
 };
 
 Gatherer.prototype.setData = function(data) {
