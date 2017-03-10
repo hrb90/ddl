@@ -12,30 +12,30 @@ function makeCircleFactory(attrs,
   var attrArea = attrs.attrArea;
   var circleFactory = new AppenderFactoryFactory("circle");
   circleFactory.setDataPrecomputer(function(data, options) {
-    var xScale = options.xScale || d3.scaleLinear()
+    options.scales = options.scales || {};
+    var xScale = options.scales.x || d3.scaleLinear()
                 .domain(d3.extent(data.map(function(d) { return d[attrX]; })))
                 .range([10, options.width - 10]);
-    var yScale = options.yScale || d3.scaleLinear()
+    var yScale = options.scales.y || d3.scaleLinear()
                 .domain(d3.extent(data.map(function(d) { return d[attrY]; })))
                 .range([options.height - 10, 10]);
-    var avgRadius = d3.mean(data.map(function(d) { return Math.sqrt(d[attrArea]); }));
+    var aScale = options.scales.a || d3.scaleLinear()
+                .domain(d3.extent(data.map(function(d) { return d[attrArea]; })))
+                .range([5, 20]);
     return {
       xScale: xScale,
       yScale: yScale,
-      avgRadius: avgRadius,
+      aScale: aScale,
       xLabel: attrMap.basicAttributes[attrX],
       yLabel: attrMap.basicAttributes[attrY]
     };
   });
   circleFactory.addAttributeSetter('cx',
-    simpleAttrSetterFactory(attrX, function(x, dataOptions) { return dataOptions.xScale(x); }));
+    simpleAttrSetterFactory(attrX, function(x, options) { return options.xScale(x); }));
   circleFactory.addAttributeSetter('cy',
-    simpleAttrSetterFactory(attrY, function(y, dataOptions) { return dataOptions.yScale(y); }));
+    simpleAttrSetterFactory(attrY, function(y, options) { return options.yScale(y); }));
   circleFactory.addAttributeSetter('r',
-    simpleAttrSetterFactory(attrArea, function(a, dataOptions) {
-      return baseRadius * ( Math.sqrt(a) / dataOptions.avgRadius );
-    })
-  );
+    simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
   var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',

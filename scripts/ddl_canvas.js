@@ -10,28 +10,28 @@ function DDLCanvas(svgId) {
   this.tooltipFactory = null;
 }
 
-DDLCanvas.prototype.addAxes = function () {
-  if (this.dataDigest.xScale) {
-    var xAxis = d3.axisTop(this.dataDigest.xScale);
+DDLCanvas.prototype.addAxes = function (options) {
+  if (options.scales.x) {
+    var xAxis = d3.axisTop(options.scales.x);
     this.canvas.append('g')
       .attr('transform', `translate(0, ${this.height() + 5})`)
       .call(xAxis);
   }
-  if (this.dataDigest.xLabel) {
+  if (options.labels.x) {
     this.canvas.append('text')
       .attr('transform', `translate(${this.width() / 2}, ${this.height() + 20})`)
-      .text(this.dataDigest.xLabel);
+      .text(options.labels.x);
   }
-  if (this.dataDigest.yScale) {
-    var yAxis = d3.axisRight(this.dataDigest.yScale);
+  if (options.scales.y) {
+    var yAxis = d3.axisRight(options.scales.y);
     this.canvas.append("g")
       .attr("transform", "translate(-10, 0)")
       .call(yAxis);
   }
-  if (this.dataDigest.yLabel) {
+  if (options.labels.y) {
     this.canvas.append('text')
       .attr('transform', `translate(-14, ${this.height() / 2})rotate(270)`)
-      .text(this.dataDigest.yLabel);
+      .text(options.labels.y);
   }
 };
 
@@ -45,34 +45,32 @@ DDLCanvas.prototype.clearCanvas = function () {
   this.canvas.selectAll('text').remove();
 };
 
-
-DDLCanvas.prototype.getFactoryOptions = function () {
-  return {
+DDLCanvas.prototype.getFactoryOptions = function (options) {
+  return Object.assign({
     width: this.width(),
     height: this.height(),
-    pinBounds: this.pinBounds
-  };
+  }, options);
 };
+
 
 DDLCanvas.prototype.height = function () {
   return this.canvas.nodes()[0].height.baseVal.value;
 };
 
-DDLCanvas.prototype.renderData = function (data) {
-  var appender = this.appenderFactory(data, this.getFactoryOptions());
-  this.dataDigest = appender.dataDigest;
-  this.addAxes();
+DDLCanvas.prototype.renderData = function (data, options) {
+  var appender = this.appenderFactory(data, this.getFactoryOptions(options));
+  this.addAxes(options);
   var tooltipAppender, tooltip;
   if (this.tooltipFactory) {
     tooltip = d3.select('body').append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
-    tooltipAppender = this.tooltipFactory(data, this.getFactoryOptions()).appender;
+    tooltipAppender = this.tooltipFactory(data, this.getFactoryOptions(options));
   }
   var plot = this.canvas.selectAll(`#${this.svgId}`)
     .data(data)
     .enter()
-    .append(appender.appender);
+    .append(appender);
   if (tooltipAppender) {
     plot.on("mouseover", function(d) {
       tooltip.transition().duration(200).style("opacity", 0.9);

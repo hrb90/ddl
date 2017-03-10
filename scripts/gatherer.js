@@ -1,5 +1,6 @@
 var d3 = require('d3');
 var makeFilterSpan = require('./make_filter_span');
+var attrs = require('./attrs');
 
 function Gatherer(factories, canvas, domElements) {
   this.factories = factories;
@@ -75,13 +76,34 @@ Gatherer.prototype.makeFactories = function (selectors) {
   return factories;
 };
 
+Gatherer.prototype.makeOptions = function (data) {
+  var attrSelectors = this.gatherAttributeSelectors();
+  var scales = {
+    x: d3.scaleLinear()
+         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrX]; })))
+         .range([10, this.canvas.width() - 10]),
+    y: d3.scaleLinear()
+         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrY]; })))
+         .range([this.canvas.height() - 10, 10]),
+    a: d3.scaleLinear()
+         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrArea]; })))
+         .range([5, 20])
+  };
+  var labels = {
+    x: attrs.basicAttributes[attrSelectors.attrX],
+    y: attrs.basicAttributes[attrSelectors.attrY]
+  };
+  return { scales: scales, labels: labels };
+};
+
 Gatherer.prototype.render = function () {
   this.canvas.clearCanvas();
   this.gatherFilters();
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setAppenderFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
-  this.canvas.renderData(this.filter(this.data));
+  var filteredData = this.filter(this.data);
+  this.canvas.renderData(filteredData, this.makeOptions(filteredData));
 };
 
 Gatherer.prototype.setData = function(data) {
