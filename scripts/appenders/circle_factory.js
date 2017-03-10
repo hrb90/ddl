@@ -28,7 +28,7 @@ function makeCircleFactory(attrs,
       aScale: aScale,
       xLabel: attrMap.basicAttributes[attrX],
       yLabel: attrMap.basicAttributes[attrY],
-      highlight: options.highlight || function(name) { return name.includes("sheed"); }
+      highlight: options.highlight || function() { return false; }
     };
   });
   circleFactory.addAttributeSetter('cx',

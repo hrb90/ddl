@@ -98,7 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }, canvas, {
     attrSelectors: document.getElementsByClassName('attr-selector'),
     filterContainer: document.getElementById('filters'),
-    newFilterForm: document.getElementById('new-filter-form')
+    newFilterForm: document.getElementById('new-filter-form'),
+    highlightInput: document.getElementById('highlight-input')
   });
   addPinner(gatherer);
   addClickers();
