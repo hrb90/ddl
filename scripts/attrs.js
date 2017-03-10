@@ -26,8 +26,7 @@ var basicAttributes = {
 };
 
 var filterAttributes = {
-  age: "Age",
-  year: "Season"
+  age: "Age"
 };
 
 module.exports = {

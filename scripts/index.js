@@ -7,6 +7,24 @@ var makeFilterSpan = require('./make_filter_span');
 var attributes = require('./attrs');
 var nbaData = require('../data/all_data.json');
 
+function populateYearSelectors() {
+  var selectors = d3.selectAll(".season-selector");
+  d3.range(1980, 2018).forEach(function(year) {
+    selectors.append("option")
+      .attr("class", `yr${year}`)
+      .attr("value", year)
+      .text(`${year-1}-${year}`);
+  });
+
+  d3.select("#start-season-selector")
+    .select(".yr2001")
+    .attr("selected", true);
+
+  d3.select("#end-season-selector")
+    .select(".yr2017")
+    .attr("selected", true);
+}
+
 function populateSelectors(selectors) {
   Object.keys(attributes.basicAttributes).forEach(function(attr) {
     selectors.append("option")
@@ -56,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var canvas = new DDLCanvas("chart");
   var attrSelectors = d3.selectAll('.attr-selector');
   populateSelectors(attrSelectors);
+  populateYearSelectors();
   var gatherer = new Gatherer({
     main: makeCircleFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
