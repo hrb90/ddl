@@ -70,6 +70,23 @@ function addClickers() {
 
 }
 
+function addPinner(gatherer) {
+  var pinIcon = document.getElementById("pin-icon");
+  pinIcon.addEventListener("click", function() {
+    if (pinIcon.className.includes("pinned")) {
+      pinIcon.className = "fa fa-map-pin";
+      gatherer.unpinBounds();
+      gatherer.render();
+    } else {
+      pinIcon.className = "fa fa-map-pin pinned";
+      gatherer.pinBounds();
+    }
+  });
+  document.getElementById('attrSelectorForms').addEventListener("change", function() {
+    pinIcon.className = "fa fa-map-pin";
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   var canvas = new DDLCanvas("chart");
   var attrSelectors = d3.selectAll('.attr-selector');
@@ -83,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
     filterContainer: document.getElementById('filters'),
     newFilterForm: document.getElementById('new-filter-form')
   });
+  addPinner(gatherer);
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
