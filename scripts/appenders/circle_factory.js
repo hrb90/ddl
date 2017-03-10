@@ -5,7 +5,7 @@ var colorPickers = require('./color_pickers.js');
 var attrMap = require('../attrs');
 
 function makeCircleFactory(attrs,
-          baseRadius = 10,
+          attrHighlight,
           colorPicker = colorPickers.positionPicker) {
   var attrX = attrs.attrX;
   var attrY = attrs.attrY;
@@ -27,7 +27,8 @@ function makeCircleFactory(attrs,
       yScale: yScale,
       aScale: aScale,
       xLabel: attrMap.basicAttributes[attrX],
-      yLabel: attrMap.basicAttributes[attrY]
+      yLabel: attrMap.basicAttributes[attrY],
+      highlight: options.highlight || function(name) { return name.includes("sheed"); }
     };
   });
   circleFactory.addAttributeSetter('cx',
@@ -36,6 +37,10 @@ function makeCircleFactory(attrs,
     simpleAttrSetterFactory(attrY, function(y, options) { return options.yScale(y); }));
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
+  circleFactory.addAttributeSetter('stroke',
+    simpleAttrSetterFactory(attrHighlight, function(h, options) {
+      return options.highlight(h) ? 'black' : 'none';
+    }));
   var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',

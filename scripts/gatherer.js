@@ -77,7 +77,7 @@ Gatherer.prototype.makeFactories = function (selectors) {
   var factories = {};
   var that = this;
   Object.keys(this.factories).forEach(function(id) {
-    factories[id] = that.factories[id](selectors);
+    factories[id] = that.factories[id](selectors, "name");
   });
   return factories;
 };
