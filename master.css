@@ -1,15 +1,32 @@
+html, body, header {
+  padding: 0;
+  margin: 0;
+}
+
 body {
   background-color: #f8f8f8;
+  height: 100vh;
+  width: 100vw;
 }
 
 #main {
   display: flex;
 }
 
+#sidebar {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.expander {
+  cursor: pointer;
+}
+
 #chart {
   padding: 30px;
-  width: 1170px;
-  height: 570px;
+  width: 100%;
+  height: 100%;
 }
 
 .hidden {
@@ -63,19 +80,4 @@ ul {
   margin: 2px;
   font-size: 14px;
   cursor: pointer;
-}
-
-#chart-wrapper i {
-  display: none;
-  font-size: 20px;
-  padding: 3px;
-  border: 1px solid lightgrey;
-  cursor: pointer;
-}
-
-#chart-wrapper:hover i {
-  display: inline;
-  position: relative;
-  bottom: 600px;
-  right: 30px;
 }
