@@ -39,25 +39,22 @@ AppenderFactoryFactory.prototype.toFactory = function () {
   var that = this;
   return function(data, options) {
     var dataDigest = that.precomputeDataOptions(data, options);
-    return {
-      dataDigest: dataDigest,
-      appender: function(dataPoint, idx) {
-        var newDOMElement = document.createElementNS(d3.namespaces.svg, that.baseType);
-        newDOMElement.className = "ddl-element";
+    return function(dataPoint, idx) {
+      var newDOMElement = document.createElementNS(d3.namespaces.svg, that.baseType);
+      newDOMElement.className = "ddl-element";
 
-        newDOMElement.innerHTML = that.innerHTMLSetter(dataPoint, idx, Object.assign({}, options, dataDigest));
+      newDOMElement.innerHTML = that.innerHTMLSetter(dataPoint, idx, Object.assign({}, options, dataDigest));
 
-        for (var i = 0; i < that.subFactories.length; i++) {
-          var child = that.subFactories[i](data, options)(dataPoint, idx);
-          newDOMElement.append(child);
-        }
+      for (var i = 0; i < that.subFactories.length; i++) {
+        var child = that.subFactories[i](data, options)(dataPoint, idx);
+        newDOMElement.append(child);
+      }
 
-        Object.keys(that.attrSetters).forEach(function(attrName) {
-          newDOMElement.setAttribute(attrName, that.attrSetters[attrName](dataPoint, idx, Object.assign({}, options, dataDigest)));
-        });
+      Object.keys(that.attrSetters).forEach(function(attrName) {
+        newDOMElement.setAttribute(attrName, that.attrSetters[attrName](dataPoint, idx, Object.assign({}, options, dataDigest)));
+      });
 
-        return newDOMElement;
-        }
+      return newDOMElement;
     };
   };
 };
