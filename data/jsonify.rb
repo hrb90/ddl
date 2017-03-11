@@ -48,9 +48,9 @@ def transform_player_pg(row)
   new_row
 end
 
-anuhliticks = []
+anuhliticks = []  # They're bullcrap, Erneh.
 
-(1980..2017).to_a.each do |year|
+(2007..2017).to_a.each do |year|
   players = {};
   ['ADV', 'PG'].each do |type|
     File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
@@ -69,6 +69,6 @@ anuhliticks = []
   anuhliticks += players.values
 end
 
-File.open('./all_data.json', 'w') do |f|
+File.open('./dev_data.json', 'w') do |f|
   f.puts(anuhliticks.to_json)
 end

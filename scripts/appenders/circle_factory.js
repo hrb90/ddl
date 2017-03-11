@@ -1,5 +1,5 @@
 var d3 = require('d3');
-var AppenderFactoryFactory = require('./appender_factory_factory');
+var UpdaterFactoryFactory = require('./updater_factory_factory');
 var simpleAttrSetterFactory = require('./simple_attr_setter_factory');
 var colorPickers = require('./color_pickers.js');
 var attrMap = require('../attrs');
@@ -10,7 +10,7 @@ function makeCircleFactory(attrs,
   var attrX = attrs.attrX;
   var attrY = attrs.attrY;
   var attrArea = attrs.attrArea;
-  var circleFactory = new AppenderFactoryFactory("circle");
+  var circleFactory = new UpdaterFactoryFactory();
   circleFactory.setDataPrecomputer(function(data, options) {
     options.scales = options.scales || {};
     var xScale = options.scales.x || d3.scaleLinear()
@@ -37,10 +37,10 @@ function makeCircleFactory(attrs,
     simpleAttrSetterFactory(attrY, function(y, options) { return options.yScale(y); }));
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
-  circleFactory.addAttributeSetter('stroke',
-    simpleAttrSetterFactory(attrHighlight, function(h, options) {
-      return options.highlight(h) ? 'black' : 'none';
-    }));
+  circleFactory.addAttributeSetter('stroke', function(d) {
+    return d.highlight ? "purple" : "none";
+  });
+  circleFactory.addAttributeSetter('stroke-width', function() { return 2; });
   var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',

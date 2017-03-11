@@ -127,21 +127,19 @@ Gatherer.prototype.pinBounds = function() {
 };
 
 Gatherer.prototype.render = function () {
-  this.canvas.clearCanvas();
   this.gatherFilters();
   var factories = this.makeFactories(this.gatherAttributeSelectors());
-  this.canvas.setAppenderFactory(factories.main);
+  this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
-  var filteredData = this.reorderData(this.filter(this.data), this.getHighlight());
+  var filteredData = this.addHighlights(this.filter(this.data), this.getHighlight());
   this.makeOptions(filteredData);
   this.canvas.renderData(filteredData, this.renderOptions);
 };
 
-Gatherer.prototype.reorderData = function(data, highlight) {
+Gatherer.prototype.addHighlights = function(data, highlight) {
   var attrHighlight = "name";
-  var unhilit = data.filter(function(d) { return !highlight(d[attrHighlight]); });
-  var hilit = data.filter(function(d) { return highlight(d[attrHighlight]); });
-  return unhilit.concat(hilit);
+  var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
+  return newData;
 };
 
 Gatherer.prototype.setData = function(data) {

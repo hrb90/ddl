@@ -42,7 +42,7 @@ Takes an array of data and renders it onto the canvas.
 
 Obvious.
 
-## AppenderFactoryFactory
+## UpdaterFactoryFactory
 
 Constructs AppenderFactories.
 
