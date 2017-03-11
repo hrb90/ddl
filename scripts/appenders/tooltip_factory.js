@@ -1,7 +1,7 @@
-var AppenderFactoryFactory = require('./appender_factory_factory');
+var UpdaterFactoryFactory = require('./updater_factory_factory');
 
 function makeTooltipFactory(attrName) {
-  var tooltipFactory = new AppenderFactoryFactory('div');
+  var tooltipFactory = new UpdaterFactoryFactory();
   tooltipFactory.setInnerHTMLSetter(function(dataPoint) {
     return `<p>${dataPoint[attrName]}</p>`;
   });
@@ -9,8 +9,9 @@ function makeTooltipFactory(attrName) {
 }
 
 function makeBasicPlayerTooltipFactory() {
-  var basicPlayerTooltipFactory = new AppenderFactoryFactory('div');
+  var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
   basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
+    console.log(playerSeason);
     return `<h4>${playerSeason.name}</h4>
             <p>${playerSeason.team} ${playerSeason.position}</p>
             <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
