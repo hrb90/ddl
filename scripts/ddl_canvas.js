@@ -1,5 +1,20 @@
 var d3 = require('d3');
 
+// Let's monkeypatch d3!
+// https://github.com/wbkd/d3-extended
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+d3.selection.prototype.moveToBack = function() {
+    return this.each(function() {
+        var firstChild = this.parentNode.firstChild;
+        if (firstChild) {
+            this.parentNode.insertBefore(this, firstChild);
+        }
+    });
+};
 
 function DDLCanvas(svgId) {
   this.svgId = svgId;
@@ -73,9 +88,13 @@ DDLCanvas.prototype.renderData = function (data, options) {
       .style('opacity', 0);
     tooltipupdater = this.tooltipFactory(data, this.getFactoryOptions(options));
   }
-  var plot = this.canvas.selectAll('.ddl-element').data(data, function(d) { return d.playerId + d.season + d.highlight; });
+  var plot = this.canvas.selectAll('.ddl-element').data(data, function(d) { return d.playerId + d.season; });
   plot.exit().remove();
-  plot = updater(plot.enter().append('circle').attr('class', 'ddl-element').merge(plot));
+  plot = updater(plot.enter().append('circle').merge(plot));
+
+  // Move highlights to front
+  var highlights = this.canvas.selectAll('.highlighted');
+  highlights.moveToFront();
 
   if (tooltipupdater) {
     plot.on("mouseover", function(d) {
