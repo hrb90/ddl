@@ -16704,519 +16704,7 @@ module.exports = makeFilterSpan;
 
 
 /***/ }),
-/* 3 */,
-/* 4 */,
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var d3 = __webpack_require__(0);
-var UpdaterFactoryFactory = __webpack_require__(12);
-var simpleAttrSetterFactory = __webpack_require__(10);
-var colorPickers = __webpack_require__(9);
-var attrMap = __webpack_require__(1);
-
-function makeCircleFactory(attrs,
-          attrHighlight,
-          colorPicker = colorPickers.positionPicker) {
-  var attrX = attrs.attrX;
-  var attrY = attrs.attrY;
-  var attrArea = attrs.attrArea;
-  var circleFactory = new UpdaterFactoryFactory();
-  circleFactory.setDataPrecomputer(function(data, options) {
-    options.scales = options.scales || {};
-    var xScale = options.scales.x || d3.scaleLinear()
-                .domain(d3.extent(data.map(function(d) { return d[attrX]; })))
-                .range([10, options.width - 10]);
-    var yScale = options.scales.y || d3.scaleLinear()
-                .domain(d3.extent(data.map(function(d) { return d[attrY]; })))
-                .range([options.height - 10, 10]);
-    var aScale = options.scales.a || d3.scaleLinear()
-                .domain(d3.extent(data.map(function(d) { return d[attrArea]; })))
-                .range([5, 20]);
-    return {
-      xScale: xScale,
-      yScale: yScale,
-      aScale: aScale,
-      xLabel: attrMap.basicAttributes[attrX],
-      yLabel: attrMap.basicAttributes[attrY],
-      highlight: options.highlight || function() { return false; }
-    };
-  });
-  circleFactory.addAttributeSetter('cx',
-    simpleAttrSetterFactory(attrX, function(x, options) { return options.xScale(x); }));
-  circleFactory.addAttributeSetter('cy',
-    simpleAttrSetterFactory(attrY, function(y, options) { return options.yScale(y); }));
-  circleFactory.addAttributeSetter('r',
-    simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
-  circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "purple" : "none";
-  });
-  circleFactory.addAttributeSetter('stroke-width', function() { return 2; });
-  var zIdx = 0;
-  circleFactory.addAttributeSetter('fill', colorPicker);
-  circleFactory.addAttributeSetter('player',
-  simpleAttrSetterFactory("playerId", function(x) { return x; }));
-  circleFactory.addAttributeSetter('opacity', function() { return 0.8; } );
-
-  return circleFactory.toFactory();
-}
-
-module.exports = makeCircleFactory;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var UpdaterFactoryFactory = __webpack_require__(12);
-
-function makeTooltipFactory(attrName) {
-  var tooltipFactory = new UpdaterFactoryFactory();
-  tooltipFactory.setInnerHTMLSetter(function(dataPoint) {
-    return `<p>${dataPoint[attrName]}</p>`;
-  });
-  return tooltipFactory.toFactory();
-}
-
-function makeBasicPlayerTooltipFactory() {
-  var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
-  basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
-    console.log(playerSeason);
-    return `<h4>${playerSeason.name}</h4>
-            <p>${playerSeason.team} ${playerSeason.position}</p>
-            <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
-  });
-  return basicPlayerTooltipFactory.toFactory();
-}
-
-module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var d3 = __webpack_require__(0);
-
-
-function DDLCanvas(svgId) {
-  this.svgId = svgId;
-  this.canvas = d3.select(`#${svgId}`);
-  this.filters = [];
-  this.pinBounds = false;
-  this.updaterFactory = function() { return function() { }; };
-  this.tooltipFactory = null;
-}
-
-DDLCanvas.prototype.addAxes = function (options) {
-  this.canvas.selectAll('.axis').remove();
-  if (options.scales.x) {
-    var xAxis = d3.axisTop(options.scales.x);
-    this.canvas.append('g')
-      .attr('class', 'axis')
-      .attr('transform', `translate(0, ${this.height() + 5})`)
-      .call(xAxis);
-  }
-  if (options.labels.x) {
-    this.canvas.append('text')
-      .attr('class', 'axis')
-      .attr('transform', `translate(${this.width() / 2}, ${this.height() + 20})`)
-      .text(options.labels.x);
-  }
-  if (options.scales.y) {
-    var yAxis = d3.axisRight(options.scales.y);
-    this.canvas.append("g")
-      .attr('class', 'axis')
-      .attr("transform", "translate(-10, 0)")
-      .call(yAxis);
-  }
-  if (options.labels.y) {
-    this.canvas.append('text')
-      .attr('class', 'axis')
-      .attr('transform', `translate(-14, ${this.height() / 2})rotate(270)`)
-      .text(options.labels.y);
-  }
-};
-
-DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
-  this.tooltipFactory = tooltipFactory;
-};
-
-DDLCanvas.prototype.clearCanvas = function () {
-  this.canvas.selectAll("circle").remove();
-  this.canvas.selectAll('g').remove();
-  this.canvas.selectAll('text').remove();
-};
-
-DDLCanvas.prototype.getFactoryOptions = function (options) {
-  return Object.assign({
-    width: this.width(),
-    height: this.height(),
-  }, options);
-};
-
-
-DDLCanvas.prototype.height = function () {
-  return this.canvas.nodes()[0].height.baseVal.value;
-};
-
-DDLCanvas.prototype.renderData = function (data, options) {
-  var updater = this.updaterFactory(data, this.getFactoryOptions(options));
-  this.addAxes(options);
-  var tooltipupdater, tooltip;
-  if (this.tooltipFactory) {
-    d3.select('body').selectAll('.tooltip').remove();
-    tooltip = d3.select('body').append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
-    tooltipupdater = this.tooltipFactory(data, this.getFactoryOptions(options));
-  }
-  var plot = this.canvas.selectAll('.ddl-element').data(data, function(d) { return d.playerId + d.season + d.highlight; });
-  plot.exit().remove();
-  plot = updater(plot.enter().append('circle').attr('class', 'ddl-element').merge(plot));
-
-  if (tooltipupdater) {
-    plot.on("mouseover", function(d) {
-      tooltip.transition().duration(200).style("opacity", 0.9);
-      tooltip.style("left", (d3.event.pageX) + "px")
-        .style("top", (d3.event.pageY - 28) + "px")
-        .style("color", "black");
-      tooltip.html(`<h4>${d.name}</h4>
-              <p>${d.team} ${d.position}</p>
-              <p>${d.season-1}-${d.season}</p>`);
-    })
-    .on("mouseout", function() {
-      tooltip.transition().duration(200).style("opacity", 0);
-    });
-  }
-};
-
-DDLCanvas.prototype.removeTooltips = function () {
-  this.tooltipFactory = null;
-};
-
-DDLCanvas.prototype.setUpdaterFactory = function (updaterFactory) {
-  this.updaterFactory = updaterFactory;
-};
-
-DDLCanvas.prototype.width = function () {
-  return this.canvas.nodes()[0].width.baseVal.value;
-};
-
-module.exports = DDLCanvas;
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var d3 = __webpack_require__(0);
-var makeFilterSpan = __webpack_require__(2);
-var attrs = __webpack_require__(1);
-
-function Gatherer(factories, canvas, domElements) {
-  this.factories = factories;
-  this.canvas = canvas;
-  this.attrSelectors = domElements.attrSelectors;
-  this.filterContainer = domElements.filterContainer;
-  this.newFilterForm = domElements.newFilterForm;
-  this.highlightInput = domElements.highlightInput;
-  this.render = this.render.bind(this);
-  this.filters = [];
-  this.data = [];
-  this.pin = false;
-  this.renderOptions = { scales: {}, labels: {} };
-  this.addListeners();
-}
-
-Gatherer.prototype.addListeners = function () {
-  var render = this.render;
-  var unpinBounds = this.unpinBounds.bind(this);
-  [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", function() {
-    unpinBounds();
-    render();
-  }); });
-  this.filterContainer.addEventListener("change", render);
-  this.newFilterForm.addEventListener("submit", function(e) {
-    e.preventDefault();
-    var attrName = document.getElementById("filter-attr").value;
-    var comp = document.getElementById("comparator").value;
-    var thresholdEl = document.getElementById("threshold");
-    var threshold = thresholdEl.value;
-    thresholdEl.value = "";
-    document.getElementById("span-filter-container").append(makeFilterSpan(attrName, comp, threshold));
-    e.currentTarget.className = "hidden";
-    render();
-  });
-  this.filterContainer.addEventListener("click", function(e) {
-    if (e.target.className === "span-filter") {
-      e.target.remove();
-      render();
-    }
-  });
-  this.highlightInput.addEventListener("change", function(e) {
-    if (e.currentTarget.value.length >= 3) {
-      render();
-    }
-  });
-};
-
-
-Gatherer.prototype.filter = function (data) {
-  var that = this;
-  return data.filter(function(d) {
-    return that.filters.every(function(f) { return f(d); } );
-  });
-};
-
-Gatherer.prototype.gatherAttributeSelectors = function () {
-  var selections = {};
-  [].forEach.call(this.attrSelectors, function (selector) {
-    selections[selector.id] = selector.value;
-  });
-  return selections;
-};
-
-Gatherer.prototype.gatherFilters = function () {
-  var posFilters = document.getElementsByClassName('posFilter');
-  var posList = [];
-  [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
-  var filterList = [ function(d) { return posList.includes(d.position); } ];
-  var minYearFilter = document.getElementById('start-season-selector');
-  var maxYearFilter = document.getElementById('end-season-selector');
-  filterList.push(function(d) { return d.season >= parseInt(minYearFilter.value); });
-  filterList.push(function(d) { return d.season <= parseInt(maxYearFilter.value); });
-  var spanFilters = document.getElementsByClassName('span-filter');
-  [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
-  this.filters = filterList;
-};
-
-Gatherer.prototype.getHighlight = function () {
-  var highlightName = this.highlightInput.value;
-  if (highlightName.length < 3) {
-    return function(name) { return false; };
-  } else {
-    return function(name) { return name.includes(highlightName); };
-  }
-};
-
-Gatherer.prototype.makeFactories = function (selectors) {
-  var attrHighlight = "name";
-  var factories = {};
-  var that = this;
-  Object.keys(this.factories).forEach(function(id) {
-    factories[id] = that.factories[id](selectors, attrHighlight);
-  });
-  return factories;
-};
-
-Gatherer.prototype.makeOptions = function (data) {
-  var attrSelectors = this.gatherAttributeSelectors();
-  var scales = this.pin ? this.renderOptions.scales : {
-    x: d3.scaleLinear()
-         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrX]; })))
-         .range([10, this.canvas.width() - 10]),
-    y: d3.scaleLinear()
-         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrY]; })))
-         .range([this.canvas.height() - 10, 10]),
-    a: d3.scaleLinear()
-         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrArea]; })))
-         .range([5, 20])
-  };
-  var labels = {
-    x: attrs.basicAttributes[attrSelectors.attrX],
-    y: attrs.basicAttributes[attrSelectors.attrY]
-  };
-  this.renderOptions = {
-    scales: scales,
-    labels: labels,
-    highlight: this.getHighlight()
-  };
-};
-
-Gatherer.prototype.pinBounds = function() {
-  this.pin = true;
-};
-
-Gatherer.prototype.render = function () {
-  this.gatherFilters();
-  var factories = this.makeFactories(this.gatherAttributeSelectors());
-  this.canvas.setUpdaterFactory(factories.main);
-  this.canvas.addTooltips(factories.tooltip);
-  var filteredData = this.addHighlights(this.filter(this.data), this.getHighlight());
-  this.makeOptions(filteredData);
-  this.canvas.renderData(filteredData, this.renderOptions);
-};
-
-Gatherer.prototype.addHighlights = function(data, highlight) {
-  var attrHighlight = "name";
-  var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
-  return newData;
-};
-
-Gatherer.prototype.setData = function(data) {
-  this.data = data;
-};
-
-Gatherer.prototype.unpinBounds = function () {
-  this.pin = false;
-};
-
-module.exports = Gatherer;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-var positionPicker = function(player) {
-  switch(player.position) {
-    case "PG":
-      return "red";
-    case "SG":
-      return "orange";
-    case "SF":
-      return "yellow";
-    case "PF":
-      return "green";
-    case "C":
-      return "blue";
-  }
-};
-
-module.exports = { positionPicker };
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-function simpleAttrSetterFactory(propName, propTransform) {
-  return function(dataPoint, idx, dataOptions) {
-    return propTransform(dataPoint[propName], dataOptions);
-  };
-}
-
-module.exports = simpleAttrSetterFactory;
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var d3 = __webpack_require__(0);
-var DDLCanvas = __webpack_require__(7);
-var makeCircleFactory = __webpack_require__(5);
-var TooltipFactories = __webpack_require__(6);
-var Gatherer = __webpack_require__(8);
-var makeFilterSpan = __webpack_require__(2);
-var attributes = __webpack_require__(1);
-var nbaData = __webpack_require__(13);
-
-function populateYearSelectors() {
-  var selectors = d3.selectAll(".season-selector");
-  d3.range(1980, 2018).forEach(function(year) {
-    selectors.append("option")
-      .attr("class", `yr${year}`)
-      .attr("value", year)
-      .text(`${year-1}-${year}`);
-  });
-
-  d3.select("#start-season-selector")
-    .select(".yr2001")
-    .attr("selected", true);
-
-  d3.select("#end-season-selector")
-    .select(".yr2017")
-    .attr("selected", true);
-}
-
-function populateSelectors(selectors) {
-  Object.keys(attributes.basicAttributes).forEach(function(attr) {
-    selectors.append("option")
-      .attr("class", attr)
-      .attr("value", attr)
-      .text(attributes.basicAttributes[attr]);
-  });
-
-  d3.select("#attrX")
-    .select(".usgPct")
-    .attr("selected", true);
-
-  d3.select("#attrY")
-    .select(".astPct")
-    .attr("selected", true);
-
-  d3.select("#attrArea")
-    .select(".minutes")
-    .attr("selected", true);
-
-  Object.keys(attributes.filterAttributes).forEach(function(attr) {
-    selectors.selectAll(".filter")
-      .append("option")
-      .attr("value", attr)
-      .text(attributes.filterAttributes[attr]);
-  });
-}
-
-function addClickers() {
-  document.getElementById("attr-selector-clicker").addEventListener("click", function() {
-    var forms = document.getElementById("attrSelectorForms");
-    forms.className = forms.className === "hidden" ? "" : "hidden";
-  });
-
-  document.getElementById("filter-clicker").addEventListener("click", function() {
-    var filters = document.getElementById("filters");
-    filters.className = filters.className === "hidden" ? "" : "hidden";
-  });
-
-  document.getElementById("new-filter-button").addEventListener("click", function(e) {
-    document.getElementById("new-filter-form").className = "";
-  });
-
-}
-
-function addPinner(gatherer) {
-  var pinIcon = document.getElementById("pin-icon");
-  pinIcon.addEventListener("click", function() {
-    if (pinIcon.className.includes("pinned")) {
-      pinIcon.className = "fa fa-map-pin";
-      gatherer.unpinBounds();
-      gatherer.render();
-    } else {
-      pinIcon.className = "fa fa-map-pin pinned";
-      gatherer.pinBounds();
-    }
-  });
-  document.getElementById('attrSelectorForms').addEventListener("change", function() {
-    pinIcon.className = "fa fa-map-pin";
-  });
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-  var canvas = new DDLCanvas("chart");
-  var attrSelectors = d3.selectAll('.attr-selector');
-  populateSelectors(attrSelectors);
-  populateYearSelectors();
-  var gatherer = new Gatherer({
-    main: makeCircleFactory,
-    tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
-  }, canvas, {
-    attrSelectors: document.getElementsByClassName('attr-selector'),
-    filterContainer: document.getElementById('filters'),
-    newFilterForm: document.getElementById('new-filter-form'),
-    highlightInput: document.getElementById('highlight-input')
-  });
-  addPinner(gatherer);
-  addClickers();
-  document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
-  gatherer.setData(nbaData);
-  gatherer.render();
-});
-
-
-/***/ }),
-/* 12 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -17267,7 +16755,7 @@ module.exports = UpdaterFactoryFactory;
 
 
 /***/ }),
-/* 13 */
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = [
@@ -191284,6 +190772,538 @@ module.exports = [
 		"ptsPg": 5.9
 	}
 ];
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var d3 = __webpack_require__(0);
+var UpdaterFactoryFactory = __webpack_require__(3);
+var simpleAttrSetterFactory = __webpack_require__(10);
+var colorPickers = __webpack_require__(9);
+var attrMap = __webpack_require__(1);
+
+function makeCircleFactory(attrs,
+          attrHighlight,
+          colorPicker = colorPickers.positionPicker) {
+  var attrX = attrs.attrX;
+  var attrY = attrs.attrY;
+  var attrArea = attrs.attrArea;
+  var circleFactory = new UpdaterFactoryFactory();
+  circleFactory.setDataPrecomputer(function(data, options) {
+    options.scales = options.scales || {};
+    var xScale = options.scales.x || d3.scaleLinear()
+                .domain(d3.extent(data.map(function(d) { return d[attrX]; })))
+                .range([10, options.width - 10]);
+    var yScale = options.scales.y || d3.scaleLinear()
+                .domain(d3.extent(data.map(function(d) { return d[attrY]; })))
+                .range([options.height - 10, 10]);
+    var aScale = options.scales.a || d3.scaleLinear()
+                .domain(d3.extent(data.map(function(d) { return d[attrArea]; })))
+                .range([5, 20]);
+    return {
+      xScale: xScale,
+      yScale: yScale,
+      aScale: aScale,
+      xLabel: attrMap.basicAttributes[attrX],
+      yLabel: attrMap.basicAttributes[attrY],
+      highlight: options.highlight || function() { return false; }
+    };
+  });
+  circleFactory.addAttributeSetter('cx',
+    simpleAttrSetterFactory(attrX, function(x, options) { return options.xScale(x); }));
+  circleFactory.addAttributeSetter('cy',
+    simpleAttrSetterFactory(attrY, function(y, options) { return options.yScale(y); }));
+  circleFactory.addAttributeSetter('r',
+    simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
+  circleFactory.addAttributeSetter('stroke', function(d) {
+    return d.highlight ? "purple" : "none";
+  });
+  circleFactory.addAttributeSetter('stroke-width', function() { return 2; });
+  var zIdx = 0;
+  circleFactory.addAttributeSetter('fill', colorPicker);
+  circleFactory.addAttributeSetter('player',
+  simpleAttrSetterFactory("playerId", function(x) { return x; }));
+  circleFactory.addAttributeSetter('opacity', function() { return 0.8; } );
+  circleFactory.addAttributeSetter('class', function(d) {
+    return d.highlight ? "ddl-element highlighted" : "ddl-element";
+  });
+
+  return circleFactory.toFactory();
+}
+
+module.exports = makeCircleFactory;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var UpdaterFactoryFactory = __webpack_require__(3);
+
+function makeTooltipFactory(attrName) {
+  var tooltipFactory = new UpdaterFactoryFactory();
+  tooltipFactory.setInnerHTMLSetter(function(dataPoint) {
+    return `<p>${dataPoint[attrName]}</p>`;
+  });
+  return tooltipFactory.toFactory();
+}
+
+function makeBasicPlayerTooltipFactory() {
+  var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
+  basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
+    console.log(playerSeason);
+    return `<h4>${playerSeason.name}</h4>
+            <p>${playerSeason.team} ${playerSeason.position}</p>
+            <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
+  });
+  return basicPlayerTooltipFactory.toFactory();
+}
+
+module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var d3 = __webpack_require__(0);
+
+// Let's monkeypatch d3!
+// https://github.com/wbkd/d3-extended
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+d3.selection.prototype.moveToBack = function() {
+    return this.each(function() {
+        var firstChild = this.parentNode.firstChild;
+        if (firstChild) {
+            this.parentNode.insertBefore(this, firstChild);
+        }
+    });
+};
+
+function DDLCanvas(svgId) {
+  this.svgId = svgId;
+  this.canvas = d3.select(`#${svgId}`);
+  this.filters = [];
+  this.pinBounds = false;
+  this.updaterFactory = function() { return function() { }; };
+  this.tooltipFactory = null;
+}
+
+DDLCanvas.prototype.addAxes = function (options) {
+  this.canvas.selectAll('.axis').remove();
+  if (options.scales.x) {
+    var xAxis = d3.axisTop(options.scales.x);
+    this.canvas.append('g')
+      .attr('class', 'axis')
+      .attr('transform', `translate(0, ${this.height() + 5})`)
+      .call(xAxis);
+  }
+  if (options.labels.x) {
+    this.canvas.append('text')
+      .attr('class', 'axis')
+      .attr('transform', `translate(${this.width() / 2}, ${this.height() + 20})`)
+      .text(options.labels.x);
+  }
+  if (options.scales.y) {
+    var yAxis = d3.axisRight(options.scales.y);
+    this.canvas.append("g")
+      .attr('class', 'axis')
+      .attr("transform", "translate(-10, 0)")
+      .call(yAxis);
+  }
+  if (options.labels.y) {
+    this.canvas.append('text')
+      .attr('class', 'axis')
+      .attr('transform', `translate(-14, ${this.height() / 2})rotate(270)`)
+      .text(options.labels.y);
+  }
+};
+
+DDLCanvas.prototype.addTooltips = function(tooltipFactory) {
+  this.tooltipFactory = tooltipFactory;
+};
+
+DDLCanvas.prototype.clearCanvas = function () {
+  this.canvas.selectAll("circle").remove();
+  this.canvas.selectAll('g').remove();
+  this.canvas.selectAll('text').remove();
+};
+
+DDLCanvas.prototype.getFactoryOptions = function (options) {
+  return Object.assign({
+    width: this.width(),
+    height: this.height(),
+  }, options);
+};
+
+
+DDLCanvas.prototype.height = function () {
+  return this.canvas.nodes()[0].height.baseVal.value;
+};
+
+DDLCanvas.prototype.renderData = function (data, options) {
+  var updater = this.updaterFactory(data, this.getFactoryOptions(options));
+  this.addAxes(options);
+  var tooltipupdater, tooltip;
+  if (this.tooltipFactory) {
+    d3.select('body').selectAll('.tooltip').remove();
+    tooltip = d3.select('body').append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
+    tooltipupdater = this.tooltipFactory(data, this.getFactoryOptions(options));
+  }
+  var plot = this.canvas.selectAll('.ddl-element').data(data, function(d) { return d.playerId + d.season; });
+  plot.exit().remove();
+  plot = updater(plot.enter().append('circle').merge(plot));
+
+  // Move highlights to front
+  var highlights = this.canvas.selectAll('.highlighted');
+  highlights.moveToFront();
+
+  if (tooltipupdater) {
+    plot.on("mouseover", function(d) {
+      tooltip.transition().duration(200).style("opacity", 0.9);
+      tooltip.style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px")
+        .style("color", "black");
+      tooltip.html(`<h4>${d.name}</h4>
+              <p>${d.team} ${d.position}</p>
+              <p>${d.season-1}-${d.season}</p>`);
+    })
+    .on("mouseout", function() {
+      tooltip.transition().duration(200).style("opacity", 0);
+    });
+  }
+};
+
+DDLCanvas.prototype.removeTooltips = function () {
+  this.tooltipFactory = null;
+};
+
+DDLCanvas.prototype.setUpdaterFactory = function (updaterFactory) {
+  this.updaterFactory = updaterFactory;
+};
+
+DDLCanvas.prototype.width = function () {
+  return this.canvas.nodes()[0].width.baseVal.value;
+};
+
+module.exports = DDLCanvas;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var d3 = __webpack_require__(0);
+var makeFilterSpan = __webpack_require__(2);
+var attrs = __webpack_require__(1);
+
+function Gatherer(factories, canvas, domElements) {
+  this.factories = factories;
+  this.canvas = canvas;
+  this.attrSelectors = domElements.attrSelectors;
+  this.filterContainer = domElements.filterContainer;
+  this.newFilterForm = domElements.newFilterForm;
+  this.highlightInput = domElements.highlightInput;
+  this.render = this.render.bind(this);
+  this.filters = [];
+  this.data = [];
+  this.pin = false;
+  this.renderOptions = { scales: {}, labels: {} };
+  this.addListeners();
+}
+
+Gatherer.prototype.addListeners = function () {
+  var render = this.render;
+  var unpinBounds = this.unpinBounds.bind(this);
+  [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", function() {
+    unpinBounds();
+    render();
+  }); });
+  this.filterContainer.addEventListener("change", render);
+  this.newFilterForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    var attrName = document.getElementById("filter-attr").value;
+    var comp = document.getElementById("comparator").value;
+    var thresholdEl = document.getElementById("threshold");
+    var threshold = thresholdEl.value;
+    thresholdEl.value = "";
+    document.getElementById("span-filter-container").append(makeFilterSpan(attrName, comp, threshold));
+    e.currentTarget.className = "hidden";
+    render();
+  });
+  this.filterContainer.addEventListener("click", function(e) {
+    if (e.target.className === "span-filter") {
+      e.target.remove();
+      render();
+    }
+  });
+  this.highlightInput.addEventListener("change", function(e) {
+    if (e.currentTarget.value.length >= 3) {
+      render();
+    }
+  });
+};
+
+
+Gatherer.prototype.filter = function (data) {
+  var that = this;
+  return data.filter(function(d) {
+    return that.filters.every(function(f) { return f(d); } );
+  });
+};
+
+Gatherer.prototype.gatherAttributeSelectors = function () {
+  var selections = {};
+  [].forEach.call(this.attrSelectors, function (selector) {
+    selections[selector.id] = selector.value;
+  });
+  return selections;
+};
+
+Gatherer.prototype.gatherFilters = function () {
+  var posFilters = document.getElementsByClassName('posFilter');
+  var posList = [];
+  [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
+  var filterList = [ function(d) { return posList.includes(d.position); } ];
+  var minYearFilter = document.getElementById('start-season-selector');
+  var maxYearFilter = document.getElementById('end-season-selector');
+  filterList.push(function(d) { return d.season >= parseInt(minYearFilter.value); });
+  filterList.push(function(d) { return d.season <= parseInt(maxYearFilter.value); });
+  var spanFilters = document.getElementsByClassName('span-filter');
+  [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
+  this.filters = filterList;
+};
+
+Gatherer.prototype.getHighlight = function () {
+  var highlightName = this.highlightInput.value;
+  if (highlightName.length < 3) {
+    return function(name) { return false; };
+  } else {
+    return function(name) { return name.includes(highlightName); };
+  }
+};
+
+Gatherer.prototype.makeFactories = function (selectors) {
+  var attrHighlight = "name";
+  var factories = {};
+  var that = this;
+  Object.keys(this.factories).forEach(function(id) {
+    factories[id] = that.factories[id](selectors, attrHighlight);
+  });
+  return factories;
+};
+
+Gatherer.prototype.makeOptions = function (data) {
+  var attrSelectors = this.gatherAttributeSelectors();
+  var scales = this.pin ? this.renderOptions.scales : {
+    x: d3.scaleLinear()
+         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrX]; })))
+         .range([10, this.canvas.width() - 10]),
+    y: d3.scaleLinear()
+         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrY]; })))
+         .range([this.canvas.height() - 10, 10]),
+    a: d3.scaleLinear()
+         .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrArea]; })))
+         .range([5, 20])
+  };
+  var labels = {
+    x: attrs.basicAttributes[attrSelectors.attrX],
+    y: attrs.basicAttributes[attrSelectors.attrY]
+  };
+  this.renderOptions = {
+    scales: scales,
+    labels: labels,
+    highlight: this.getHighlight()
+  };
+};
+
+Gatherer.prototype.pinBounds = function() {
+  this.pin = true;
+};
+
+Gatherer.prototype.render = function () {
+  this.gatherFilters();
+  var factories = this.makeFactories(this.gatherAttributeSelectors());
+  this.canvas.setUpdaterFactory(factories.main);
+  this.canvas.addTooltips(factories.tooltip);
+  var filteredData = this.addHighlights(this.filter(this.data), this.getHighlight());
+  this.makeOptions(filteredData);
+  this.canvas.renderData(filteredData, this.renderOptions);
+};
+
+Gatherer.prototype.addHighlights = function(data, highlight) {
+  var attrHighlight = "name";
+  var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
+  return newData;
+};
+
+Gatherer.prototype.setData = function(data) {
+  this.data = data;
+};
+
+Gatherer.prototype.unpinBounds = function () {
+  this.pin = false;
+};
+
+module.exports = Gatherer;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+var positionPicker = function(player) {
+  switch(player.position) {
+    case "PG":
+      return "red";
+    case "SG":
+      return "orange";
+    case "SF":
+      return "yellow";
+    case "PF":
+      return "green";
+    case "C":
+      return "blue";
+  }
+};
+
+module.exports = { positionPicker };
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+function simpleAttrSetterFactory(propName, propTransform) {
+  return function(dataPoint, idx, dataOptions) {
+    return propTransform(dataPoint[propName], dataOptions);
+  };
+}
+
+module.exports = simpleAttrSetterFactory;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var d3 = __webpack_require__(0);
+var DDLCanvas = __webpack_require__(7);
+var makeCircleFactory = __webpack_require__(5);
+var TooltipFactories = __webpack_require__(6);
+var Gatherer = __webpack_require__(8);
+var makeFilterSpan = __webpack_require__(2);
+var attributes = __webpack_require__(1);
+var nbaData = __webpack_require__(4);
+
+function populateYearSelectors() {
+  var selectors = d3.selectAll(".season-selector");
+  d3.range(1980, 2018).forEach(function(year) {
+    selectors.append("option")
+      .attr("class", `yr${year}`)
+      .attr("value", year)
+      .text(`${year-1}-${year}`);
+  });
+
+  d3.select("#start-season-selector")
+    .select(".yr2001")
+    .attr("selected", true);
+
+  d3.select("#end-season-selector")
+    .select(".yr2017")
+    .attr("selected", true);
+}
+
+function populateSelectors(selectors) {
+  Object.keys(attributes.basicAttributes).forEach(function(attr) {
+    selectors.append("option")
+      .attr("class", attr)
+      .attr("value", attr)
+      .text(attributes.basicAttributes[attr]);
+  });
+
+  d3.select("#attrX")
+    .select(".usgPct")
+    .attr("selected", true);
+
+  d3.select("#attrY")
+    .select(".astPct")
+    .attr("selected", true);
+
+  d3.select("#attrArea")
+    .select(".minutes")
+    .attr("selected", true);
+
+  Object.keys(attributes.filterAttributes).forEach(function(attr) {
+    selectors.selectAll(".filter")
+      .append("option")
+      .attr("value", attr)
+      .text(attributes.filterAttributes[attr]);
+  });
+}
+
+function addClickers() {
+  document.getElementById("attr-selector-clicker").addEventListener("click", function() {
+    var forms = document.getElementById("attrSelectorForms");
+    forms.className = forms.className === "hidden" ? "" : "hidden";
+  });
+
+  document.getElementById("filter-clicker").addEventListener("click", function() {
+    var filters = document.getElementById("filters");
+    filters.className = filters.className === "hidden" ? "" : "hidden";
+  });
+
+  document.getElementById("new-filter-button").addEventListener("click", function(e) {
+    document.getElementById("new-filter-form").className = "";
+  });
+
+}
+
+function addPinner(gatherer) {
+  var pinIcon = document.getElementById("pin-icon");
+  pinIcon.addEventListener("click", function() {
+    if (pinIcon.className.includes("pinned")) {
+      pinIcon.className = "fa fa-map-pin";
+      gatherer.unpinBounds();
+      gatherer.render();
+    } else {
+      pinIcon.className = "fa fa-map-pin pinned";
+      gatherer.pinBounds();
+    }
+  });
+  document.getElementById('attrSelectorForms').addEventListener("change", function() {
+    pinIcon.className = "fa fa-map-pin";
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  var canvas = new DDLCanvas("chart");
+  var attrSelectors = d3.selectAll('.attr-selector');
+  populateSelectors(attrSelectors);
+  populateYearSelectors();
+  var gatherer = new Gatherer({
+    main: makeCircleFactory,
+    tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
+  }, canvas, {
+    attrSelectors: document.getElementsByClassName('attr-selector'),
+    filterContainer: document.getElementById('filters'),
+    newFilterForm: document.getElementById('new-filter-form'),
+    highlightInput: document.getElementById('highlight-input')
+  });
+  addPinner(gatherer);
+  addClickers();
+  document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
+  gatherer.setData(nbaData);
+  gatherer.render();
+});
+
 
 /***/ })
 /******/ ]);
