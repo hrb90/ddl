@@ -191086,7 +191086,7 @@ Gatherer.prototype.getHighlight = function () {
   if (highlightName.length < 3) {
     return function(name) { return false; };
   } else {
-    return function(name) { return name.includes(highlightName); };
+    return function(name) { return name.toLowerCase().includes(highlightName.toLowerCase()); };
   }
 };
 
