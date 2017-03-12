@@ -46,6 +46,9 @@ function makeCircleFactory(attrs,
   circleFactory.addAttributeSetter('player',
   simpleAttrSetterFactory("playerId", function(x) { return x; }));
   circleFactory.addAttributeSetter('opacity', function() { return 0.8; } );
+  circleFactory.addAttributeSetter('class', function(d) {
+    return d.highlight ? "ddl-element highlighted" : "ddl-element";
+  });
 
   return circleFactory.toFactory();
 }
