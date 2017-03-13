@@ -102,9 +102,7 @@ DDLCanvas.prototype.renderData = function (data, options) {
       tooltip.style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY - 28) + "px")
         .style("color", "black");
-      tooltip.html(`<h4>${d.name}</h4>
-              <p>${d.team} ${d.position}</p>
-              <p>${d.season-1}-${d.season}</p>`);
+      tooltipupdater(tooltip.data([d]));
     })
     .on("mouseout", function() {
       tooltip.transition().duration(200).style("opacity", 0);
