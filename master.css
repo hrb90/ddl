@@ -44,6 +44,10 @@ div.tooltip {
   pointer-events: none;
 }
 
+.tooltip p {
+  margin: 4px 0;
+}
+
 ul {
   list-style: none;
   padding: 0;
