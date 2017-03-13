@@ -1,12 +1,14 @@
-html, body, header {
+html, header {
   padding: 0;
   margin: 0;
 }
 
 body {
   background-color: #f8f8f8;
-  height: 100vh;
-  width: 100vw;
+  height: calc(100vh - 10px);
+  width: calc(100vw - 10px);
+  padding: 5px;
+  margin: 0;
 }
 
 #main {
@@ -17,6 +19,40 @@ body {
   width: 200px;
   display: flex;
   flex-direction: column;
+  margin-right: 5px;
+}
+
+#sidebar span {
+  margin-bottom: 10px;
+}
+
+#sidebar section {
+  margin: 10px 0;
+}
+
+#attrSelectorForms ul {
+  margin: 10px 30px;
+}
+
+#attrSelectorForms li {
+  display: flex;
+  justify-content: space-between;
+}
+
+#pos-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#year-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+.posFilter {
+  margin-right: 15px;
 }
 
 .expander {
@@ -42,6 +78,10 @@ div.tooltip {
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
+}
+
+.tooltip p {
+  margin: 4px 0;
 }
 
 ul {
@@ -92,9 +132,9 @@ ul {
 
 #chart-container i.pinned, #chart-container:hover i {
   display: inline;
-  position: relative;
-  left: 30px;
-  bottom: 600px;
+  position: absolute;
+  left: 230px;
+  top: 100px;
 }
 
 #chart-container i.pinned {

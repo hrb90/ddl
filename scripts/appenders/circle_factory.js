@@ -38,9 +38,9 @@ function makeCircleFactory(attrs,
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
   circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "purple" : "none";
+    return d.highlight ? "grey" : "none";
   });
-  circleFactory.addAttributeSetter('stroke-width', function() { return 2; });
+  circleFactory.addAttributeSetter('stroke-width', function() { return 3; });
   var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',

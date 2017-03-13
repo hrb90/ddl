@@ -19,17 +19,17 @@
           <ul>
             <li>
               <label for="#attrX">X axis</label>
-              <select class="attr-selector" id="attrX">
+              <select class="graph-selector attr-selector" id="attrX">
               </select>
             </li>
             <li>
               <label for="#attrY">Y axis</label>
-              <select class="attr-selector" id="attrY">
+              <select class="graph-selector attr-selector" id="attrY">
               </select>
             </li>
             <li>
               <label for="#attrArea">Area</label>
-              <select class="attr-selector" id="attrArea">
+              <select class="graph-selector attr-selector" id="attrArea">
               </select>
             </li>
           </ul>
@@ -37,36 +37,38 @@
         <span class="expander" id="filter-clicker">Filters</span>
         <div id="filter-container">
           <div id="filters" class="hidden">
-            <ul>
-              <li>
+            <section id="pos-filters">
+              <div>
                 <label for="chkPG">PG</label>
                 <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
-              </li>
-              <li>
+              </div>
+              <div>
                 <label for="chkSG">SG</label>
                 <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
-              </li>
-              <li>
+              </div>
+              <div>
                 <label for="chkSF">SF</label>
                 <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
-              </li>
-              <li>
+              </div>
+              <div>
                 <label for="chkPF">PF</label>
                 <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
-              </li>
-              <li>
+              </div>
+              <div>
                 <label for="chkC">C</label>
                 <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
-              </li>
-            </ul>
-            <label for="year-filters">Seasons</label>
-            <span id="year-filters">
-              <select class="season-selector" id="start-season-selector">
-              </select>
-              to
-              <select class="season-selector" id="end-season-selector">
-              </select>
-            </span>
+              </div>
+            </section>
+            <section>
+              <label for="year-filters">Seasons</label>
+              <span id="year-filters">
+                <select class="season-selector" id="start-season-selector">
+                </select>
+                to
+                <select class="season-selector" id="end-season-selector">
+                </select>
+              </span>
+            </section>
             <button id="new-filter-button">Add filter</button>
             <div id="span-filter-container"></div>
           </div>
@@ -82,7 +84,7 @@
             <input type="Submit" value="Add Filter">
           </form>
         </div>
-        <input id="highlight-input" placeholder="Type a player's name to highlight them"></input>
+        <input id="highlight-input" placeholder="Highlight a player"></input>
       </aside>
       <div id="chart-container">
         <svg id="chart" width="1170" height="570">
