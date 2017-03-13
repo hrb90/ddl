@@ -16680,12 +16680,15 @@ module.exports = {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var attrs = __webpack_require__(1);
 
 function makeFilterSpan(attrName, comparator, threshold) {
   var filterSpan = document.createElement("span");
+  var attrMap = Object.assign({}, attrs.basicAttributes, attrs.filterAttributes);
   filterSpan.className = "span-filter";
-  filterSpan.innerText = `${attrName} ${comparator} ${threshold}`;
+  filterSpan.innerText = `${attrMap[attrName]} ${comparator} ${threshold}`;
   filterSpan.data = { filter: function (d) {
       switch(comparator) {
         case "<=":
@@ -190817,9 +190820,9 @@ function makeCircleFactory(attrs,
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
   circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "purple" : "none";
+    return d.highlight ? "grey" : "none";
   });
-  circleFactory.addAttributeSetter('stroke-width', function() { return 2; });
+  circleFactory.addAttributeSetter('stroke-width', function() { return 3; });
   var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',
