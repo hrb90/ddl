@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
     main: makeCircleFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
   }, canvas, {
-    attrSelectors: document.getElementsByClassName('attr-selector'),
+    attrSelectors: document.getElementsByClassName('graph-selector'),
     filterContainer: document.getElementById('filters'),
     newFilterForm: document.getElementById('new-filter-form'),
     highlightInput: document.getElementById('highlight-input')
