@@ -16680,12 +16680,15 @@ module.exports = {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var attrs = __webpack_require__(1);
 
 function makeFilterSpan(attrName, comparator, threshold) {
   var filterSpan = document.createElement("span");
+  var attrMap = Object.assign({}, attrs.basicAttributes, attrs.filterAttributes);
   filterSpan.className = "span-filter";
-  filterSpan.innerText = `${attrName} ${comparator} ${threshold}`;
+  filterSpan.innerText = `${attrMap[attrName]} ${comparator} ${threshold}`;
   filterSpan.data = { filter: function (d) {
       switch(comparator) {
         case "<=":
@@ -190817,9 +190820,9 @@ function makeCircleFactory(attrs,
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
   circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "purple" : "none";
+    return d.highlight ? "grey" : "none";
   });
-  circleFactory.addAttributeSetter('stroke-width', function() { return 2; });
+  circleFactory.addAttributeSetter('stroke-width', function() { return 3; });
   var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',
@@ -190840,6 +190843,7 @@ module.exports = makeCircleFactory;
 /***/ (function(module, exports, __webpack_require__) {
 
 var UpdaterFactoryFactory = __webpack_require__(3);
+var attributeMap = __webpack_require__(1);
 
 function makeTooltipFactory(attrName) {
   var tooltipFactory = new UpdaterFactoryFactory();
@@ -190849,13 +190853,15 @@ function makeTooltipFactory(attrName) {
   return tooltipFactory.toFactory();
 }
 
-function makeBasicPlayerTooltipFactory() {
+function makeBasicPlayerTooltipFactory(attrs) {
   var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
   basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
-    console.log(playerSeason);
     return `<h4>${playerSeason.name}</h4>
             <p>${playerSeason.team} ${playerSeason.position}</p>
-            <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
+            <p>${playerSeason.season-1}-${playerSeason.season}</p>
+            ${Object.values(attrs).map(function(attr) {
+              return `<p>${attributeMap.basicAttributes[attr]}: ${playerSeason[attr]}</p>`;
+            }).join('')}`;
   });
   return basicPlayerTooltipFactory.toFactory();
 }
@@ -190971,9 +190977,7 @@ DDLCanvas.prototype.renderData = function (data, options) {
       tooltip.style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY - 28) + "px")
         .style("color", "black");
-      tooltip.html(`<h4>${d.name}</h4>
-              <p>${d.team} ${d.position}</p>
-              <p>${d.season-1}-${d.season}</p>`);
+      tooltipupdater(tooltip.data([d]));
     })
     .on("mouseout", function() {
       tooltip.transition().duration(200).style("opacity", 0);
@@ -191292,7 +191296,7 @@ document.addEventListener('DOMContentLoaded', function () {
     main: makeCircleFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
   }, canvas, {
-    attrSelectors: document.getElementsByClassName('attr-selector'),
+    attrSelectors: document.getElementsByClassName('graph-selector'),
     filterContainer: document.getElementById('filters'),
     newFilterForm: document.getElementById('new-filter-form'),
     highlightInput: document.getElementById('highlight-input')
