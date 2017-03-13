@@ -190840,6 +190840,7 @@ module.exports = makeCircleFactory;
 /***/ (function(module, exports, __webpack_require__) {
 
 var UpdaterFactoryFactory = __webpack_require__(3);
+var attributeMap = __webpack_require__(1);
 
 function makeTooltipFactory(attrName) {
   var tooltipFactory = new UpdaterFactoryFactory();
@@ -190849,13 +190850,15 @@ function makeTooltipFactory(attrName) {
   return tooltipFactory.toFactory();
 }
 
-function makeBasicPlayerTooltipFactory() {
+function makeBasicPlayerTooltipFactory(attrs) {
   var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
   basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
-    console.log(playerSeason);
     return `<h4>${playerSeason.name}</h4>
             <p>${playerSeason.team} ${playerSeason.position}</p>
-            <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
+            <p>${playerSeason.season-1}-${playerSeason.season}</p>
+            ${Object.values(attrs).map(function(attr) {
+              return `<p>${attributeMap.basicAttributes[attr]}: ${playerSeason[attr]}</p>`;
+            }).join('')}`;
   });
   return basicPlayerTooltipFactory.toFactory();
 }
@@ -190971,9 +190974,7 @@ DDLCanvas.prototype.renderData = function (data, options) {
       tooltip.style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY - 28) + "px")
         .style("color", "black");
-      tooltip.html(`<h4>${d.name}</h4>
-              <p>${d.team} ${d.position}</p>
-              <p>${d.season-1}-${d.season}</p>`);
+      tooltipupdater(tooltip.data([d]));
     })
     .on("mouseout", function() {
       tooltip.transition().duration(200).style("opacity", 0);
@@ -191292,7 +191293,7 @@ document.addEventListener('DOMContentLoaded', function () {
     main: makeCircleFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
   }, canvas, {
-    attrSelectors: document.getElementsByClassName('attr-selector'),
+    attrSelectors: document.getElementsByClassName('graph-selector'),
     filterContainer: document.getElementById('filters'),
     newFilterForm: document.getElementById('new-filter-form'),
     highlightInput: document.getElementById('highlight-input')
