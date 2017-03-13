@@ -1,4 +1,5 @@
 var UpdaterFactoryFactory = require('./updater_factory_factory');
+var attributeMap = require('../attrs');
 
 function makeTooltipFactory(attrName) {
   var tooltipFactory = new UpdaterFactoryFactory();
@@ -8,13 +9,15 @@ function makeTooltipFactory(attrName) {
   return tooltipFactory.toFactory();
 }
 
-function makeBasicPlayerTooltipFactory() {
+function makeBasicPlayerTooltipFactory(attrs) {
   var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
   basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
-    console.log(playerSeason);
     return `<h4>${playerSeason.name}</h4>
             <p>${playerSeason.team} ${playerSeason.position}</p>
-            <p>${playerSeason.season-1}-${playerSeason.season}</p>`;
+            <p>${playerSeason.season-1}-${playerSeason.season}</p>
+            ${Object.values(attrs).map(function(attr) {
+              return `<p>${attributeMap.basicAttributes[attr]}: ${playerSeason[attr]}</p>`;
+            }).join('')}`;
   });
   return basicPlayerTooltipFactory.toFactory();
 }
