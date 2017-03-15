@@ -11,6 +11,22 @@ body {
   margin: 0;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+footer {
+  height: 30px;
+  text-align: center;
+  font-size: 12px;
+  margin: 0 auto;
+}
+
+footer p {
+  margin: 0;
+}
+
 #main {
   display: flex;
 }
@@ -144,5 +160,5 @@ ul {
 
 .full-page {
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 30px);
 }
