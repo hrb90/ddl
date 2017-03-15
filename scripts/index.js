@@ -68,6 +68,25 @@ function addClickers() {
     document.getElementById("new-filter-form").className = "";
   });
 
+  document.getElementById("glossary-link").addEventListener("click", function() {
+    document.getElementById("glossary").className = "full-page";
+    document.getElementById("main").className = "hidden";
+  });
+
+  document.getElementById("glossary-close").addEventListener("click", function() {
+    document.getElementById("glossary").className = "hidden";
+    document.getElementById("main").className = "";
+  });
+
+  document.getElementById("howto-link").addEventListener("click", function() {
+    document.getElementById("how-to").className = "full-page";
+    document.getElementById("main").className = "hidden";
+  });
+
+  document.getElementById("howto-close").addEventListener("click", function() {
+    document.getElementById("how-to").className = "hidden";
+    document.getElementById("main").className = "";
+  });
 }
 
 function addPinner(gatherer) {
