@@ -25,100 +25,158 @@
       </div>
     </header>
     <div id="main">
-      <aside id="sidebar">
-        <span class="expander" id="attr-selector-clicker">Graph Properties</span>
-        <div id="attrSelectorForms" class="">
-          <ul>
-            <li>
-              <label for="#attrX">X axis</label>
-              <select class="graph-selector attr-selector" id="attrX">
-              </select>
-            </li>
-            <li>
-              <label for="#attrY">Y axis</label>
-              <select class="graph-selector attr-selector" id="attrY">
-              </select>
-            </li>
-            <li>
-              <label for="#attrArea">Area</label>
-              <select class="graph-selector attr-selector" id="attrArea">
-              </select>
-            </li>
-          </ul>
-        </div>
-        <span class="expander" id="filter-clicker">Filters</span>
-        <div id="filter-container">
-          <div id="filters" class="">
-            <section id="pos-filters">
-              <div>
-                <label for="chkPG">PG</label>
-                <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
-              </div>
-              <div>
-                <label for="chkSG">SG</label>
-                <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
-              </div>
-              <div>
-                <label for="chkSF">SF</label>
-                <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
-              </div>
-              <div>
-                <label for="chkPF">PF</label>
-                <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
-              </div>
-              <div>
-                <label for="chkC">C</label>
-                <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
-              </div>
-            </section>
-            <section>
-              <label for="year-filters">Seasons</label>
-              <span id="year-filters">
-                <select class="season-selector" id="start-season-selector">
+      <div id="main-no-footer">
+        <aside id="sidebar">
+          <span class="expander" id="attr-selector-clicker">Graph Properties</span>
+          <div id="attrSelectorForms" class="">
+            <ul>
+              <li>
+                <label for="#attrX">X axis</label>
+                <select class="graph-selector attr-selector" id="attrX">
                 </select>
-                to
-                <select class="season-selector" id="end-season-selector">
+              </li>
+              <li>
+                <label for="#attrY">Y axis</label>
+                <select class="graph-selector attr-selector" id="attrY">
                 </select>
-              </span>
-            </section>
-            <button id="new-filter-button">Add filter</button>
-            <div id="span-filter-container"></div>
+              </li>
+              <li>
+                <label for="#attrArea">Area</label>
+                <select class="graph-selector attr-selector" id="attrArea">
+                </select>
+              </li>
+            </ul>
           </div>
-          <form id="new-filter-form" class="hidden">
-            <select class="attr-selector filter" id="filter-attr">
-            </select>
-            <select id="comparator">
-              <option value="<="><=</option>
-              <option value="=">=</option>
-              <option value=">=">>=</option>
-            </select>
-            <input type="text" id="threshold">
-            <input type="Submit" value="Add Filter">
-          </form>
+          <span class="expander" id="filter-clicker">Filters</span>
+          <div id="filter-container">
+            <div id="filters" class="">
+              <section id="pos-filters">
+                <div>
+                  <label for="chkPG">PG</label>
+                  <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
+                </div>
+                <div>
+                  <label for="chkSG">SG</label>
+                  <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
+                </div>
+                <div>
+                  <label for="chkSF">SF</label>
+                  <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
+                </div>
+                <div>
+                  <label for="chkPF">PF</label>
+                  <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
+                </div>
+                <div>
+                  <label for="chkC">C</label>
+                  <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+                </div>
+              </section>
+              <section>
+                <label for="year-filters">Seasons</label>
+                <span id="year-filters">
+                  <select class="season-selector" id="start-season-selector">
+                  </select>
+                  to
+                  <select class="season-selector" id="end-season-selector">
+                  </select>
+                </span>
+              </section>
+              <button id="new-filter-button">Add filter</button>
+              <div id="span-filter-container"></div>
+            </div>
+            <form id="new-filter-form" class="hidden">
+              <select class="attr-selector filter" id="filter-attr">
+              </select>
+              <select id="comparator">
+                <option value="<="><=</option>
+                <option value="=">=</option>
+                <option value=">=">>=</option>
+              </select>
+              <input type="text" id="threshold">
+              <input type="Submit" value="Add Filter">
+            </form>
+          </div>
+          <input id="highlight-input" placeholder="Highlight a player"></input>
+        </aside>
+        <div id="chart-container">
+          <svg id="chart" width="1170" height="570">
+          </svg>
+          <i id="pin-icon" class="fa fa-map-pin" aria-hidden="true"></i>
         </div>
-        <input id="highlight-input" placeholder="Highlight a player"></input>
-      </aside>
-      <div id="chart-container">
-        <svg id="chart" width="1170" height="570">
-        </svg>
-        <i id="pin-icon" class="fa fa-map-pin" aria-hidden="true"></i>
       </div>
+      <footer>
+        <p>
+          Check out my: <a href="http://github.com/hrb90">Github</a> <a href="https://www.linkedin.com/in/harrison-brown-a34540101/">LinkedIn</a> <a href="http://www.harrisonrbrown.com">Homepage</a>
+        </p>
+        <p>
+          All data courtesy <a href="http://basketball-reference.com">Basketball Reference</a>.
+        </p>
+      </footer>
     </div>
     <div id="glossary" class="hidden">
       <i id="glossary-close" class="fa fa-times"></i>
-      This is a glossary!
+      <h2>Glossary</h2>
+      <section>
+        <h3>Basic stats</h3>
+
+        <b>PTS/G</b>, <b>AST/G</b>, <b>REB/G</b>, <b>STL/G</b>, <b>BLK/G</b>, and <b>TOV/G</b> refer to points, assists, total rebounds, steals, blocks, and turnovers per game respectively.
+
+        <b>FG%</b>, <b>3P%</b>, and <b>FT%</b> refer to field goal percentage, three point percentage, and free throw percentage, respectively.
+
+        For definitions of these standard box score statistics, please refer to <a href="https://en.wikipedia.org/wiki/Glossary_of_basketball_terms">Wikipedia</a>.
+      </section>
+      <section>
+        <h3>Advanced stats</h3>
+
+        For details on computation of these stats, please visit <a href="http://www.basketball-reference.com/about/glossary.html">
+          Basketball-Reference.
+        </a>
+
+        <h4>TS%</h4>
+
+        True Shooting percentage. An estimate of a player's overall scoring efficiency, taking into account field goals, 3-point field goals, and free throws.
+
+        <h4>3PAr</h4>
+
+        Three-point attempt rate. The proportion of a player's total field goal attempts that are three-point attempts.
+
+        <h4>AST%</h4>
+
+        Assist percentage. An estimate of the percentage of teammate field goals a player assisted while on the floor.
+
+        <h4>ORB%</h4>
+
+        Offensive rebound percentage. The percentage of missed opponent shots rebounded by the player.
+
+        <h4>DRB%</h4>
+
+        Defensive rebound percentage. The percentage of missed team shots rebounded by the player.
+
+        <h4>TRB%</h4>
+
+        Total rebound percentage. The overall percentage of missed shots rebounded by the player.
+
+        <h4>STL%</h4>
+
+        Steal percentage. The percentage of opponent possessions that end in a steal by the player.
+
+        <h4>BLK%</h4>
+
+        Block percentage. The percentage of opponent shots blocked by the player.
+
+        <h4>USG%</h4>
+
+        Usage percentage. The percentage of team possessions ended by the player with a field goal attempt, free throw attempts, or a turnover.
+
+        <h4>TOV%</h4>
+
+        Turnover percentage. Of the possessions ended by the player with a field goal attempt, free throw attempt, or turnover, the percentage that ended with a turnover.
+      </section>
     </div>
     <div id="how-to" class="hidden">
       <i id="howto-close" class="fa fa-times"></i>
       This is a howto!
     </div>
-    <footer>
-      <p>
-        Check out my: <a href="http://github.com/hrb90">Github</a> <a href="https://www.linkedin.com/in/harrison-brown-a34540101/">LinkedIn</a> <a href="http://www.harrisonrbrown.com">Homepage</a>
-      </p>
-      <p>
-        All data courtesy <a href="http://basketball-reference.com">Basketball Reference</a>.
-      </p>
-    </footer>
   </body>
 </html>

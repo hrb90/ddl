@@ -27,7 +27,7 @@ footer p {
   margin: 0;
 }
 
-#main {
+#main-no-footer {
   display: flex;
 }
 
