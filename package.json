@@ -4,7 +4,9 @@
   "description": "NBA stats data visualization",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "./node_modules/.bin/webpack --watch",
+    "postinstall": "./node_modules/.bin/webpack"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,7 @@
   },
   "homepage": "https://github.com/hrb90/ddl#readme",
   "dependencies": {
-    "d3": "^4.7.0"
+    "d3": "^4.7.0",
+    "webpack": "^2.2.1"
   }
 }
