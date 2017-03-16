@@ -3,6 +3,7 @@ var basicAttributes = {
   threeRate: "3PAr",
   astPct: "AST%",
   oRbPct: "ORB%",
+  dRbPct: "DRB%",
   tRbPct: "TRB%",
   stlPct: "STL%",
   blkPct: "BLK%",
