@@ -19,10 +19,11 @@
   <body>
     <header>
       <h1>Data Don't Lie</h1>
-      <div>
+      <p>
+        Visualizing NBA player statistics
         <a href="#" id="glossary-link">Glossary</a>
         <a href="#" id="howto-link">How to Use</a>
-      </div>
+      </p>
     </header>
     <div id="main">
       <div id="main-no-footer">
@@ -52,23 +53,23 @@
             <div id="filters" class="">
               <section id="pos-filters">
                 <div>
-                  <label for="chkPG">PG</label>
+                  <label for="chkPG" class="pg">PG</label>
                   <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
                 </div>
                 <div>
-                  <label for="chkSG">SG</label>
+                  <label for="chkSG" class="sg">SG</label>
                   <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
                 </div>
                 <div>
-                  <label for="chkSF">SF</label>
+                  <label for="chkSF" class="sf">SF</label>
                   <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
                 </div>
                 <div>
-                  <label for="chkPF">PF</label>
+                  <label for="chkPF" class="pf">PF</label>
                   <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
                 </div>
                 <div>
-                  <label for="chkC">C</label>
+                  <label for="chkC" class="c">C</label>
                   <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
                 </div>
               </section>
@@ -100,7 +101,7 @@
           <input id="highlight-input" placeholder="Highlight a player"></input>
         </aside>
         <div id="chart-container">
-          <svg id="chart" width="1170" height="570">
+          <svg id="chart" width="970" height="560">
           </svg>
           <i id="pin-icon" class="fa fa-map-pin" aria-hidden="true"></i>
         </div>
