@@ -70,6 +70,7 @@ function addClickers() {
 
   document.getElementById("glossary-link").addEventListener("click", function() {
     document.getElementById("glossary").className = "full-page";
+    document.getElementById("how-to").className = "hidden";
     document.getElementById("main").className = "hidden";
   });
 
@@ -80,6 +81,7 @@ function addClickers() {
 
   document.getElementById("howto-link").addEventListener("click", function() {
     document.getElementById("how-to").className = "full-page";
+    document.getElementById("glossary").className = "hidden";
     document.getElementById("main").className = "hidden";
   });
 
