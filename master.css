@@ -29,7 +29,6 @@ footer p {
 
 #main-no-footer {
   display: flex;
-  height: calc(100vh - 150px);
 }
 
 #sidebar {
