@@ -13,6 +13,10 @@ DDL was built to enforce the following dataflow:
 
 ## Features
 
+### Dataset
+
+The dataset contains statistics from every NBA player-season since the introduction of the three-point line in 1979. I scraped this data from basketball-reference.com with an assist (geddit?) from [Naz Ahmed](https://github.com/nastynaz).
+
 ### Chart
 
 DDL's chart is built using an inline SVG element. Shapes are rendered onto it using D3.js.
@@ -25,16 +29,16 @@ The Gatherer class puts listeners on appropriate elements to rerender when the u
 
 The Updater pattern is the core of Data Don't Lie. An updater is a function with signature `(data, options) => (data-joined D3 selection) => (updated D3 selection)`. The first call, passing in (data, options), allows us to precompute scaling functions and other things that need access to the entire data set under consideration. The second call actually updates the visual properties of the data-joined D3 selection.
 
-There is also an UpdaterFactoryFactory class which allows for easy construction of updater functions.
+There is also an UpdaterBuilder class which allows for easy construction of updater functions.
 
 This is a very powerful and general pattern allowing for easy maintenance and extensibility.
 
 ### DDLCanvas
 
-The DDLCanvas class is a wrapper around the SVG HTML element. It allows you to set an updater factory and render data to the canvas with a single method call. It also provides height and width information to the Gatherer object.
+The DDLCanvas class is a wrapper around the SVG HTML element. It allows you to set an updater builder and render data to the canvas with a single method call. It also provides height and width information to the Gatherer object.
 
 ## Libraries
 
-DDL was built with D3.js.
+DDL was built with [D3.js](https://d3js.org/). The data was scraped using [nokogiri](http://www.nokogiri.org/).
 
 ## Future Directions

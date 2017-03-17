@@ -1,17 +1,17 @@
-var UpdaterFactoryFactory = require('./updater_factory_factory');
+var UpdaterBuilder = require('./updater_builder');
 var attributeMap = require('../attrs');
 
 function makeTooltipFactory(attrName) {
-  var tooltipFactory = new UpdaterFactoryFactory();
-  tooltipFactory.setInnerHTMLSetter(function(dataPoint) {
+  var tooltipBuilder = new UpdaterBuilder();
+  tooltipBuilder.setInnerHTMLSetter(function(dataPoint) {
     return `<p>${dataPoint[attrName]}</p>`;
   });
-  return tooltipFactory.toFactory();
+  return tooltipBuilder.build();
 }
 
 function makeBasicPlayerTooltipFactory(attrs) {
-  var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
-  basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
+  var basicPlayerTooltipBuilder = new UpdaterBuilder();
+  basicPlayerTooltipBuilder.setInnerHTMLSetter(function(playerSeason) {
     return `<h4>${playerSeason.name}</h4>
             <p>${playerSeason.team} ${playerSeason.position}</p>
             <p>${playerSeason.season-1}-${playerSeason.season}</p>
@@ -19,7 +19,7 @@ function makeBasicPlayerTooltipFactory(attrs) {
               return `<p>${attributeMap.basicAttributes[attr]}: ${playerSeason[attr]}</p>`;
             }).join('')}`;
   });
-  return basicPlayerTooltipFactory.toFactory();
+  return basicPlayerTooltipBuilder.build();
 }
 
 module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };

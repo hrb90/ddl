@@ -1,6 +1,6 @@
 var d3 = require('d3');
 var DDLCanvas = require('./ddl_canvas');
-var makeCircleFactory = require('./appenders/circle_factory');
+var circleUpdaterFactory = require('./appenders/circle_factory');
 var TooltipFactories = require('./appenders/tooltip_factory');
 var Gatherer = require('./gatherer');
 var makeFilterSpan = require('./make_filter_span');
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
   populateSelectors(attrSelectors);
   populateYearSelectors();
   var gatherer = new Gatherer({
-    main: makeCircleFactory,
+    main: circleUpdaterFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
   }, canvas, {
     attrSelectors: document.getElementsByClassName('graph-selector'),
