@@ -1,16 +1,16 @@
 var d3 = require('d3');
-var UpdaterFactoryFactory = require('./updater_factory_factory');
+var UpdaterBuilder = require('./updater_builder');
 var simpleAttrSetterFactory = require('./simple_attr_setter_factory');
 var colorPickers = require('./color_pickers.js');
 var attrMap = require('../attrs');
 
-function makeCircleFactory(attrs,
+function circleUpdaterFactory(attrs,
           attrHighlight,
           colorPicker = colorPickers.positionPicker) {
   var attrX = attrs.attrX;
   var attrY = attrs.attrY;
   var attrArea = attrs.attrArea;
-  var circleFactory = new UpdaterFactoryFactory();
+  var circleFactory = new UpdaterBuilder();
   circleFactory.setDataPrecomputer(function(data, options) {
     options.scales = options.scales || {};
     var xScale = options.scales.x || d3.scaleLinear()
@@ -50,7 +50,7 @@ function makeCircleFactory(attrs,
     return d.highlight ? "ddl-element highlighted" : "ddl-element";
   });
 
-  return circleFactory.toFactory();
+  return circleFactory.build();
 }
 
-module.exports = makeCircleFactory;
+module.exports = circleUpdaterFactory;

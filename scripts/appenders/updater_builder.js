@@ -1,30 +1,30 @@
 var d3 = require('d3');
 
-function UpdaterFactoryFactory(attrSetters = {}) {
+function UpdaterBuilder(attrSetters = {}) {
   this.attrSetters = attrSetters;
   this.innerHTMLSetter = function () { return ""; };
   this.precomputeDataOptions = function(data) { return {}; };
 }
 
-UpdaterFactoryFactory.prototype.addAttributeSetter = function (attrName, setter) {
+UpdaterBuilder.prototype.addAttributeSetter = function (attrName, setter) {
   this.attrSetters[attrName] = setter;
 };
 
 
-UpdaterFactoryFactory.prototype.clearAttributeSetters = function () {
+UpdaterBuilder.prototype.clearAttributeSetters = function () {
   this.attrSetters = {};
 };
 
-UpdaterFactoryFactory.prototype.setDataPrecomputer = function (precomputer) {
+UpdaterBuilder.prototype.setDataPrecomputer = function (precomputer) {
   this.precomputeDataOptions = precomputer;
 };
 
-UpdaterFactoryFactory.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
+UpdaterBuilder.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
   this.innerHTMLSetter = innerHTMLSetter;
 };
 
 
-UpdaterFactoryFactory.prototype.toFactory = function () {
+UpdaterBuilder.prototype.build = function () {
   var that = this;
   return function(data, options) {
     var dataDigest = that.precomputeDataOptions(data, options);
@@ -42,4 +42,4 @@ UpdaterFactoryFactory.prototype.toFactory = function () {
   };
 };
 
-module.exports = UpdaterFactoryFactory;
+module.exports = UpdaterBuilder;
