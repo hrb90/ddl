@@ -16708,31 +16708,31 @@ module.exports = makeFilterSpan;
 
 var d3 = __webpack_require__(0);
 
-function UpdaterFactoryFactory(attrSetters = {}) {
+function UpdaterBuilder(attrSetters = {}) {
   this.attrSetters = attrSetters;
   this.innerHTMLSetter = function () { return ""; };
   this.precomputeDataOptions = function(data) { return {}; };
 }
 
-UpdaterFactoryFactory.prototype.addAttributeSetter = function (attrName, setter) {
+UpdaterBuilder.prototype.addAttributeSetter = function (attrName, setter) {
   this.attrSetters[attrName] = setter;
 };
 
 
-UpdaterFactoryFactory.prototype.clearAttributeSetters = function () {
+UpdaterBuilder.prototype.clearAttributeSetters = function () {
   this.attrSetters = {};
 };
 
-UpdaterFactoryFactory.prototype.setDataPrecomputer = function (precomputer) {
+UpdaterBuilder.prototype.setDataPrecomputer = function (precomputer) {
   this.precomputeDataOptions = precomputer;
 };
 
-UpdaterFactoryFactory.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
+UpdaterBuilder.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
   this.innerHTMLSetter = innerHTMLSetter;
 };
 
 
-UpdaterFactoryFactory.prototype.toFactory = function () {
+UpdaterBuilder.prototype.build = function () {
   var that = this;
   return function(data, options) {
     var dataDigest = that.precomputeDataOptions(data, options);
@@ -16750,7 +16750,7 @@ UpdaterFactoryFactory.prototype.toFactory = function () {
   };
 };
 
-module.exports = UpdaterFactoryFactory;
+module.exports = UpdaterBuilder;
 
 
 /***/ }),
@@ -190777,18 +190777,18 @@ module.exports = [
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var UpdaterFactoryFactory = __webpack_require__(3);
+var UpdaterBuilder = __webpack_require__(3);
 var simpleAttrSetterFactory = __webpack_require__(10);
 var colorPickers = __webpack_require__(9);
 var attrMap = __webpack_require__(1);
 
-function makeCircleFactory(attrs,
+function circleUpdaterFactory(attrs,
           attrHighlight,
           colorPicker = colorPickers.positionPicker) {
   var attrX = attrs.attrX;
   var attrY = attrs.attrY;
   var attrArea = attrs.attrArea;
-  var circleFactory = new UpdaterFactoryFactory();
+  var circleFactory = new UpdaterBuilder();
   circleFactory.setDataPrecomputer(function(data, options) {
     options.scales = options.scales || {};
     var xScale = options.scales.x || d3.scaleLinear()
@@ -190828,30 +190828,30 @@ function makeCircleFactory(attrs,
     return d.highlight ? "ddl-element highlighted" : "ddl-element";
   });
 
-  return circleFactory.toFactory();
+  return circleFactory.build();
 }
 
-module.exports = makeCircleFactory;
+module.exports = circleUpdaterFactory;
 
 
 /***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var UpdaterFactoryFactory = __webpack_require__(3);
+var UpdaterBuilder = __webpack_require__(3);
 var attributeMap = __webpack_require__(1);
 
 function makeTooltipFactory(attrName) {
-  var tooltipFactory = new UpdaterFactoryFactory();
-  tooltipFactory.setInnerHTMLSetter(function(dataPoint) {
+  var tooltipBuilder = new UpdaterBuilder();
+  tooltipBuilder.setInnerHTMLSetter(function(dataPoint) {
     return `<p>${dataPoint[attrName]}</p>`;
   });
-  return tooltipFactory.toFactory();
+  return tooltipBuilder.build();
 }
 
 function makeBasicPlayerTooltipFactory(attrs) {
-  var basicPlayerTooltipFactory = new UpdaterFactoryFactory();
-  basicPlayerTooltipFactory.setInnerHTMLSetter(function(playerSeason) {
+  var basicPlayerTooltipBuilder = new UpdaterBuilder();
+  basicPlayerTooltipBuilder.setInnerHTMLSetter(function(playerSeason) {
     return `<h4>${playerSeason.name}</h4>
             <p>${playerSeason.team} ${playerSeason.position}</p>
             <p>${playerSeason.season-1}-${playerSeason.season}</p>
@@ -190859,7 +190859,7 @@ function makeBasicPlayerTooltipFactory(attrs) {
               return `<p>${attributeMap.basicAttributes[attr]}: ${playerSeason[attr]}</p>`;
             }).join('')}`;
   });
-  return basicPlayerTooltipFactory.toFactory();
+  return basicPlayerTooltipBuilder.build();
 }
 
 module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };
@@ -191196,7 +191196,7 @@ module.exports = simpleAttrSetterFactory;
 
 var d3 = __webpack_require__(0);
 var DDLCanvas = __webpack_require__(7);
-var makeCircleFactory = __webpack_require__(5);
+var circleUpdaterFactory = __webpack_require__(5);
 var TooltipFactories = __webpack_require__(6);
 var Gatherer = __webpack_require__(8);
 var makeFilterSpan = __webpack_require__(2);
@@ -191310,7 +191310,7 @@ document.addEventListener('DOMContentLoaded', function () {
   populateSelectors(attrSelectors);
   populateYearSelectors();
   var gatherer = new Gatherer({
-    main: makeCircleFactory,
+    main: circleUpdaterFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
   }, canvas, {
     attrSelectors: document.getElementsByClassName('graph-selector'),

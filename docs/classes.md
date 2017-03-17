@@ -42,7 +42,7 @@ Takes an array of data and renders it onto the canvas.
 
 Obvious.
 
-## UpdaterFactoryFactory
+## UpdaterBuilder
 
 Constructs AppenderFactories.
 
@@ -60,6 +60,6 @@ Does what you think it does.
 
 Sets the type of DOM element the AppenderFactory will return.
 
-### toFactory()
+### build()
 
 Returns an AppenderFactory.
