@@ -63,21 +63,21 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// https://d3js.org Version 4.7.3. Copyright 2017 Mike Bostock.
+// https://d3js.org Version 4.7.1. Copyright 2017 Mike Bostock.
 (function (global, factory) {
 	 true ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(factory((global.d3 = global.d3 || {})));
 }(this, (function (exports) { 'use strict';
 
-var version = "4.7.3";
+var version = "4.7.1";
 
 var ascending = function(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
@@ -3405,7 +3405,7 @@ var transition_attr = function(name, value) {
   return this.attrTween(name, typeof value === "function"
       ? (fullname.local ? attrFunctionNS$1 : attrFunction$1)(fullname, i, tweenValue(this, "attr." + name, value))
       : value == null ? (fullname.local ? attrRemoveNS$1 : attrRemove$1)(fullname)
-      : (fullname.local ? attrConstantNS$1 : attrConstant$1)(fullname, i, value + ""));
+      : (fullname.local ? attrConstantNS$1 : attrConstant$1)(fullname, i, value));
 };
 
 function attrTweenNS(fullname, value) {
@@ -3674,7 +3674,7 @@ var transition_style = function(name, value, priority) {
           .on("end.style." + name, styleRemoveEnd(name))
       : this.styleTween(name, typeof value === "function"
           ? styleFunction$1(name, i, tweenValue(this, "style." + name, value))
-          : styleConstant$1(name, i, value + ""), priority);
+          : styleConstant$1(name, i, value), priority);
 };
 
 function styleTween(name, value, priority) {
@@ -9313,6 +9313,10 @@ function mercatorProjection(project) {
       clipExtent = m.clipExtent,
       x0 = null, y0, x1, y1; // clip extent
 
+  m.center = function(_) {
+    return arguments.length ? (center(_), reclip()) : center();
+  };
+
   m.scale = function(_) {
     return arguments.length ? (scale(_), reclip()) : scale();
   };
@@ -9321,21 +9325,16 @@ function mercatorProjection(project) {
     return arguments.length ? (translate(_), reclip()) : translate();
   };
 
-  m.center = function(_) {
-    return arguments.length ? (center(_), reclip()) : center();
-  };
-
   m.clipExtent = function(_) {
     return arguments.length ? ((_ == null ? x0 = y0 = x1 = y1 = null : (x0 = +_[0][0], y0 = +_[0][1], x1 = +_[1][0], y1 = +_[1][1])), reclip()) : x0 == null ? null : [[x0, y0], [x1, y1]];
   };
 
   function reclip() {
     var k = pi$3 * scale(),
-        t = m(rotation(m.rotate()).invert([0, 0]));
+        t = m([0, 0]);
     return clipExtent(x0 == null
-        ? [[t[0] - k, t[1] - k], [t[0] + k, t[1] + k]] : project === mercatorRaw
-        ? [[Math.max(t[0] - k, x0), y0], [Math.min(t[0] + k, x1), y1]]
-        : [[x0, Math.max(t[1] - k, y0)], [x1, Math.min(t[1] + k, y1)]]);
+        ? [[t[0] - k, t[1] - k], [t[0] + k, t[1] + k]]
+        : [[Math.max(t[0] - k, x0), y0], [Math.min(t[0] + k, x1), y1]]);
   }
 
   return reclip();
@@ -9963,6 +9962,12 @@ function intersects(a, b) {
   return dr * dr - 1e-6 > dx * dx + dy * dy;
 }
 
+function distance1(a, b) {
+  var l = a._.r;
+  while (a !== b) l += 2 * (a = a.next)._.r;
+  return l - b._.r;
+}
+
 function distance2(node, x, y) {
   var a = node._,
       b = node.next._,
@@ -10020,13 +10025,15 @@ function packEnclose(circles) {
     do {
       if (sj <= sk) {
         if (intersects(j._, c._)) {
-          b = j, a.next = b, b.previous = a, --i;
+          if (sj + a._.r + b._.r > distance1(j, b)) a = j; else b = j;
+          a.next = b, b.previous = a, --i;
           continue pack;
         }
         sj += j._.r, j = j.next;
       } else {
         if (intersects(k._, c._)) {
-          a = k, a.next = b, b.previous = a, --i;
+          if (distance1(a, k) > sk + a._.r + b._.r) a = k; else b = k;
+          a.next = b, b.previous = a, --i;
           continue pack;
         }
         sk += k._.r, k = k.previous;
@@ -10734,19 +10741,17 @@ var binary = function(parent, x0, y0, x1, y1) {
       else hi = mid;
     }
 
-    if ((valueTarget - sums[k - 1]) < (sums[k] - valueTarget) && i + 1 < k) --k;
-
     var valueLeft = sums[k] - valueOffset,
         valueRight = value - valueLeft;
 
-    if ((x1 - x0) > (y1 - y0)) {
-      var xk = (x0 * valueRight + x1 * valueLeft) / value;
-      partition(i, k, valueLeft, x0, y0, xk, y1);
-      partition(k, j, valueRight, xk, y0, x1, y1);
-    } else {
+    if ((y1 - y0) > (x1 - x0)) {
       var yk = (y0 * valueRight + y1 * valueLeft) / value;
       partition(i, k, valueLeft, x0, y0, x1, yk);
       partition(k, j, valueRight, x0, yk, x1, y1);
+    } else {
+      var xk = (x0 * valueRight + x1 * valueLeft) / value;
+      partition(i, k, valueLeft, x0, y0, xk, y1);
+      partition(k, j, valueRight, xk, y0, x1, y1);
     }
   }
 };
@@ -16704,57 +16709,6 @@ module.exports = makeFilterSpan;
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var d3 = __webpack_require__(0);
-
-function UpdaterBuilder(attrSetters = {}) {
-  this.attrSetters = attrSetters;
-  this.innerHTMLSetter = function () { return ""; };
-  this.precomputeDataOptions = function(data) { return {}; };
-}
-
-UpdaterBuilder.prototype.addAttributeSetter = function (attrName, setter) {
-  this.attrSetters[attrName] = setter;
-};
-
-
-UpdaterBuilder.prototype.clearAttributeSetters = function () {
-  this.attrSetters = {};
-};
-
-UpdaterBuilder.prototype.setDataPrecomputer = function (precomputer) {
-  this.precomputeDataOptions = precomputer;
-};
-
-UpdaterBuilder.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
-  this.innerHTMLSetter = innerHTMLSetter;
-};
-
-
-UpdaterBuilder.prototype.build = function () {
-  var that = this;
-  return function(data, options) {
-    var dataDigest = that.precomputeDataOptions(data, options);
-    return function(selection) {
-      Object.keys(that.attrSetters).forEach(function(attrName) {
-        selection.attr(attrName, function(d, idx) {
-          return that.attrSetters[attrName](d, idx, Object.assign({}, options, dataDigest));
-        });
-      });
-      selection.html(function(d, idx) {
-        return that.innerHTMLSetter(d, idx, Object.assign({}, options, dataDigest));
-      });
-      return selection;
-    };
-  };
-};
-
-module.exports = UpdaterBuilder;
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = [
@@ -190773,13 +190727,13 @@ module.exports = [
 ];
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var UpdaterBuilder = __webpack_require__(3);
-var simpleAttrSetterFactory = __webpack_require__(10);
-var colorPickers = __webpack_require__(9);
+var UpdaterBuilder = __webpack_require__(8);
+var simpleAttrSetterFactory = __webpack_require__(11);
+var colorPickers = __webpack_require__(10);
 var attrMap = __webpack_require__(1);
 
 function circleUpdaterFactory(attrs,
@@ -190816,10 +190770,9 @@ function circleUpdaterFactory(attrs,
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
   circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "grey" : "none";
+    return d.highlight ? "gold" : "none";
   });
   circleFactory.addAttributeSetter('stroke-width', function() { return 3; });
-  var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',
   simpleAttrSetterFactory("playerId", function(x) { return x; }));
@@ -190835,10 +190788,10 @@ module.exports = circleUpdaterFactory;
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var UpdaterBuilder = __webpack_require__(3);
+var UpdaterBuilder = __webpack_require__(8);
 var attributeMap = __webpack_require__(1);
 
 function makeTooltipFactory(attrName) {
@@ -190866,7 +190819,7 @@ module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -190997,7 +190950,7 @@ module.exports = DDLCanvas;
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -191156,52 +191109,68 @@ module.exports = Gatherer;
 
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-var positionPicker = function(player) {
-  switch(player.position) {
-    case "PG":
-      return "red";
-    case "SG":
-      return "orange";
-    case "SF":
-      return "yellow";
-    case "PF":
-      return "green";
-    case "C":
-      return "blue";
-  }
-};
-
-module.exports = { positionPicker };
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-function simpleAttrSetterFactory(propName, propTransform) {
-  return function(dataPoint, idx, dataOptions) {
-    return propTransform(dataPoint[propName], dataOptions);
-  };
-}
-
-module.exports = simpleAttrSetterFactory;
-
-
-/***/ }),
-/* 11 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var DDLCanvas = __webpack_require__(7);
-var circleUpdaterFactory = __webpack_require__(5);
-var TooltipFactories = __webpack_require__(6);
-var Gatherer = __webpack_require__(8);
+
+function UpdaterBuilder(attrSetters = {}) {
+  this.attrSetters = attrSetters;
+  this.innerHTMLSetter = function () { return ""; };
+  this.precomputeDataOptions = function(data) { return {}; };
+}
+
+UpdaterBuilder.prototype.addAttributeSetter = function (attrName, setter) {
+  this.attrSetters[attrName] = setter;
+};
+
+
+UpdaterBuilder.prototype.clearAttributeSetters = function () {
+  this.attrSetters = {};
+};
+
+UpdaterBuilder.prototype.setDataPrecomputer = function (precomputer) {
+  this.precomputeDataOptions = precomputer;
+};
+
+UpdaterBuilder.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
+  this.innerHTMLSetter = innerHTMLSetter;
+};
+
+
+UpdaterBuilder.prototype.build = function () {
+  var that = this;
+  return function(data, options) {
+    var dataDigest = that.precomputeDataOptions(data, options);
+    return function(selection) {
+      Object.keys(that.attrSetters).forEach(function(attrName) {
+        selection.attr(attrName, function(d, idx) {
+          return that.attrSetters[attrName](d, idx, Object.assign({}, options, dataDigest));
+        });
+      });
+      selection.html(function(d, idx) {
+        return that.innerHTMLSetter(d, idx, Object.assign({}, options, dataDigest));
+      });
+      return selection;
+    };
+  };
+};
+
+module.exports = UpdaterBuilder;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var d3 = __webpack_require__(0);
+var DDLCanvas = __webpack_require__(6);
+var circleUpdaterFactory = __webpack_require__(4);
+var TooltipFactories = __webpack_require__(5);
+var Gatherer = __webpack_require__(7);
 var makeFilterSpan = __webpack_require__(2);
 var attributes = __webpack_require__(1);
-var nbaData = __webpack_require__(4);
+var nbaData = __webpack_require__(3);
 
 function populateYearSelectors() {
   var selectors = d3.selectAll(".season-selector");
@@ -191324,6 +191293,48 @@ document.addEventListener('DOMContentLoaded', function () {
   gatherer.setData(nbaData);
   gatherer.render();
 });
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+var positionPicker = function(player) {
+  var colorPairs = [];
+  switch(player.position) {
+    case "PG":
+      colorPairs = ["red", "#e51616"];
+      break;
+    case "SG":
+      colorPairs = ["orange", "#e59d16"];
+      break;
+    case "SF":
+      colorPairs = ["yellow", "#e5e516"];
+      break;
+    case "PF":
+      colorPairs = ["green", "#16e516"];
+      break;
+    case "C":
+      colorPairs = ["blue", "#1616e5"];
+      break;
+  }
+  return player.highlight ? colorPairs[0] : colorPairs[1];
+};
+
+module.exports = { positionPicker };
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+function simpleAttrSetterFactory(propName, propTransform) {
+  return function(dataPoint, idx, dataOptions) {
+    return propTransform(dataPoint[propName], dataOptions);
+  };
+}
+
+module.exports = simpleAttrSetterFactory;
 
 
 /***/ })
