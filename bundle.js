@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -16709,6 +16709,57 @@ module.exports = makeFilterSpan;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var d3 = __webpack_require__(0);
+
+function UpdaterBuilder(attrSetters = {}) {
+  this.attrSetters = attrSetters;
+  this.innerHTMLSetter = function () { return ""; };
+  this.precomputeDataOptions = function(data) { return {}; };
+}
+
+UpdaterBuilder.prototype.addAttributeSetter = function (attrName, setter) {
+  this.attrSetters[attrName] = setter;
+};
+
+
+UpdaterBuilder.prototype.clearAttributeSetters = function () {
+  this.attrSetters = {};
+};
+
+UpdaterBuilder.prototype.setDataPrecomputer = function (precomputer) {
+  this.precomputeDataOptions = precomputer;
+};
+
+UpdaterBuilder.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
+  this.innerHTMLSetter = innerHTMLSetter;
+};
+
+
+UpdaterBuilder.prototype.build = function () {
+  var that = this;
+  return function(data, options) {
+    var dataDigest = that.precomputeDataOptions(data, options);
+    return function(selection) {
+      Object.keys(that.attrSetters).forEach(function(attrName) {
+        selection.attr(attrName, function(d, idx) {
+          return that.attrSetters[attrName](d, idx, Object.assign({}, options, dataDigest));
+        });
+      });
+      selection.html(function(d, idx) {
+        return that.innerHTMLSetter(d, idx, Object.assign({}, options, dataDigest));
+      });
+      return selection;
+    };
+  };
+};
+
+module.exports = UpdaterBuilder;
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = [
@@ -190727,13 +190778,13 @@ module.exports = [
 ];
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var UpdaterBuilder = __webpack_require__(8);
-var simpleAttrSetterFactory = __webpack_require__(11);
-var colorPickers = __webpack_require__(10);
+var UpdaterBuilder = __webpack_require__(3);
+var simpleAttrSetterFactory = __webpack_require__(10);
+var colorPickers = __webpack_require__(9);
 var attrMap = __webpack_require__(1);
 
 function circleUpdaterFactory(attrs,
@@ -190788,10 +190839,10 @@ module.exports = circleUpdaterFactory;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var UpdaterBuilder = __webpack_require__(8);
+var UpdaterBuilder = __webpack_require__(3);
 var attributeMap = __webpack_require__(1);
 
 function makeTooltipFactory(attrName) {
@@ -190819,7 +190870,7 @@ module.exports = { makeTooltipFactory, makeBasicPlayerTooltipFactory };
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -190950,7 +191001,7 @@ module.exports = DDLCanvas;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
@@ -190967,16 +191018,16 @@ function Gatherer(factories, canvas, domElements) {
   this.render = this.render.bind(this);
   this.filters = [];
   this.data = [];
-  this.pin = false;
+  this.pin = { attrArea: true };
   this.renderOptions = { scales: {}, labels: {} };
   this.addListeners();
 }
 
 Gatherer.prototype.addListeners = function () {
   var render = this.render;
-  var unpinBounds = this.unpinBounds.bind(this);
+  var unpinScale = this.unpinScale.bind(this);
   [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", function() {
-    unpinBounds();
+    unpinScale(s.parentNode.id);
     render();
   }); });
   this.filterContainer.addEventListener("change", render);
@@ -191015,7 +191066,7 @@ Gatherer.prototype.filter = function (data) {
 Gatherer.prototype.gatherAttributeSelectors = function () {
   var selections = {};
   [].forEach.call(this.attrSelectors, function (selector) {
-    selections[selector.id] = selector.value;
+    selections[selector.parentNode.id] = selector.value;
   });
   return selections;
 };
@@ -191055,14 +191106,14 @@ Gatherer.prototype.makeFactories = function (selectors) {
 
 Gatherer.prototype.makeOptions = function (data) {
   var attrSelectors = this.gatherAttributeSelectors();
-  var scales = this.pin ? this.renderOptions.scales : {
-    x: d3.scaleLinear()
+  var scales = {
+    x: this.pin["attrX"] ? this.renderOptions.scales.x : d3.scaleLinear()
          .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrX]; })))
          .range([10, this.canvas.width() - 10]),
-    y: d3.scaleLinear()
+    y: this.pin["attrY"] ? this.renderOptions.scales.y : d3.scaleLinear()
          .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrY]; })))
          .range([this.canvas.height() - 10, 10]),
-    a: d3.scaleLinear()
+    a: this.pin["attrArea"] ? this.renderOptions.scales.a : d3.scaleLinear()
          .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrArea]; })))
          .range([5, 20])
   };
@@ -191077,8 +191128,8 @@ Gatherer.prototype.makeOptions = function (data) {
   };
 };
 
-Gatherer.prototype.pinBounds = function() {
-  this.pin = true;
+Gatherer.prototype.pinScale = function(attrName) {
+  this.pin[attrName] = true;
 };
 
 Gatherer.prototype.render = function () {
@@ -191101,76 +191152,67 @@ Gatherer.prototype.setData = function(data) {
   this.data = data;
 };
 
-Gatherer.prototype.unpinBounds = function () {
-  this.pin = false;
+Gatherer.prototype.unpinScale = function (attrName) {
+  this.pin[attrName] = false;
 };
 
 module.exports = Gatherer;
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 9 */
+/***/ (function(module, exports) {
 
-var d3 = __webpack_require__(0);
-
-function UpdaterBuilder(attrSetters = {}) {
-  this.attrSetters = attrSetters;
-  this.innerHTMLSetter = function () { return ""; };
-  this.precomputeDataOptions = function(data) { return {}; };
-}
-
-UpdaterBuilder.prototype.addAttributeSetter = function (attrName, setter) {
-  this.attrSetters[attrName] = setter;
+var positionPicker = function(player) {
+  var colorPairs = [];
+  switch(player.position) {
+    case "PG":
+      colorPairs = ["red", "#e51616"];
+      break;
+    case "SG":
+      colorPairs = ["orange", "#e59d16"];
+      break;
+    case "SF":
+      colorPairs = ["yellow", "#e5e516"];
+      break;
+    case "PF":
+      colorPairs = ["green", "#16e516"];
+      break;
+    case "C":
+      colorPairs = ["blue", "#1616e5"];
+      break;
+  }
+  return player.highlight ? colorPairs[0] : colorPairs[1];
 };
 
-
-UpdaterBuilder.prototype.clearAttributeSetters = function () {
-  this.attrSetters = {};
-};
-
-UpdaterBuilder.prototype.setDataPrecomputer = function (precomputer) {
-  this.precomputeDataOptions = precomputer;
-};
-
-UpdaterBuilder.prototype.setInnerHTMLSetter = function (innerHTMLSetter) {
-  this.innerHTMLSetter = innerHTMLSetter;
-};
-
-
-UpdaterBuilder.prototype.build = function () {
-  var that = this;
-  return function(data, options) {
-    var dataDigest = that.precomputeDataOptions(data, options);
-    return function(selection) {
-      Object.keys(that.attrSetters).forEach(function(attrName) {
-        selection.attr(attrName, function(d, idx) {
-          return that.attrSetters[attrName](d, idx, Object.assign({}, options, dataDigest));
-        });
-      });
-      selection.html(function(d, idx) {
-        return that.innerHTMLSetter(d, idx, Object.assign({}, options, dataDigest));
-      });
-      return selection;
-    };
-  };
-};
-
-module.exports = UpdaterBuilder;
+module.exports = { positionPicker };
 
 
 /***/ }),
-/* 9 */
+/* 10 */
+/***/ (function(module, exports) {
+
+function simpleAttrSetterFactory(propName, propTransform) {
+  return function(dataPoint, idx, dataOptions) {
+    return propTransform(dataPoint[propName], dataOptions);
+  };
+}
+
+module.exports = simpleAttrSetterFactory;
+
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var d3 = __webpack_require__(0);
-var DDLCanvas = __webpack_require__(6);
-var circleUpdaterFactory = __webpack_require__(4);
-var TooltipFactories = __webpack_require__(5);
-var Gatherer = __webpack_require__(7);
+var DDLCanvas = __webpack_require__(7);
+var circleUpdaterFactory = __webpack_require__(5);
+var TooltipFactories = __webpack_require__(6);
+var Gatherer = __webpack_require__(8);
 var makeFilterSpan = __webpack_require__(2);
 var attributes = __webpack_require__(1);
-var nbaData = __webpack_require__(3);
+var nbaData = __webpack_require__(4);
 
 function populateYearSelectors() {
   var selectors = d3.selectAll(".season-selector");
@@ -191256,16 +191298,16 @@ function addClickers() {
   });
 }
 
-function addPinner(gatherer) {
-  var pinIcon = document.getElementById("pin-icon");
+function addPinner(attrName, gatherer) {
+  var pinIcon = document.getElementById(attrName).getElementsByTagName("i")[0];
   pinIcon.addEventListener("click", function() {
     if (pinIcon.className.includes("pinned")) {
       pinIcon.className = "fa fa-map-pin";
-      gatherer.unpinBounds();
+      gatherer.unpinScale(attrName);
       gatherer.render();
     } else {
       pinIcon.className = "fa fa-map-pin pinned";
-      gatherer.pinBounds();
+      gatherer.pinScale(attrName);
     }
   });
   document.getElementById('attrSelectorForms').addEventListener("change", function() {
@@ -191287,54 +191329,14 @@ document.addEventListener('DOMContentLoaded', function () {
     newFilterForm: document.getElementById('new-filter-form'),
     highlightInput: document.getElementById('highlight-input')
   });
-  addPinner(gatherer);
+  ["attrX",
+   "attrY",
+   "attrArea"].forEach(function(name) { addPinner(name, gatherer); });
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
   gatherer.render();
 });
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-var positionPicker = function(player) {
-  var colorPairs = [];
-  switch(player.position) {
-    case "PG":
-      colorPairs = ["red", "#e51616"];
-      break;
-    case "SG":
-      colorPairs = ["orange", "#e59d16"];
-      break;
-    case "SF":
-      colorPairs = ["yellow", "#e5e516"];
-      break;
-    case "PF":
-      colorPairs = ["green", "#16e516"];
-      break;
-    case "C":
-      colorPairs = ["blue", "#1616e5"];
-      break;
-  }
-  return player.highlight ? colorPairs[0] : colorPairs[1];
-};
-
-module.exports = { positionPicker };
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports) {
-
-function simpleAttrSetterFactory(propName, propTransform) {
-  return function(dataPoint, idx, dataOptions) {
-    return propTransform(dataPoint[propName], dataOptions);
-  };
-}
-
-module.exports = simpleAttrSetterFactory;
 
 
 /***/ })
