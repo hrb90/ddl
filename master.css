@@ -177,19 +177,17 @@ ul {
   cursor: pointer;
 }
 
-#chart-container i {
-  display: none;
-  font-size: 20px;
+i.fa-map-pin {
+  font-size: 14px;
   padding: 3px;
   border: 1px solid lightgrey;
   cursor: pointer;
+  color: lightgrey;
 }
 
-#chart-container i.pinned, #chart-container:hover i {
-  display: inline;
-  position: absolute;
-  left: 230px;
-  top: 100px;
+i.fa-map-pin.pinned {
+  border: 1px solid lightsteelblue;
+  color: lightsteelblue;
 }
 
 #chart-container i.pinned {

@@ -12,16 +12,16 @@ function Gatherer(factories, canvas, domElements) {
   this.render = this.render.bind(this);
   this.filters = [];
   this.data = [];
-  this.pin = false;
+  this.pin = { attrArea: true };
   this.renderOptions = { scales: {}, labels: {} };
   this.addListeners();
 }
 
 Gatherer.prototype.addListeners = function () {
   var render = this.render;
-  var unpinBounds = this.unpinBounds.bind(this);
+  var unpinScale = this.unpinScale.bind(this);
   [].forEach.call(this.attrSelectors, function(s) {s.addEventListener("change", function() {
-    unpinBounds();
+    unpinScale(s.parentNode.id);
     render();
   }); });
   this.filterContainer.addEventListener("change", render);
@@ -100,14 +100,14 @@ Gatherer.prototype.makeFactories = function (selectors) {
 
 Gatherer.prototype.makeOptions = function (data) {
   var attrSelectors = this.gatherAttributeSelectors();
-  var scales = this.pin ? this.renderOptions.scales : {
-    x: d3.scaleLinear()
+  var scales = {
+    x: this.pin["attrX"] ? this.renderOptions.scales.x : d3.scaleLinear()
          .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrX]; })))
          .range([10, this.canvas.width() - 10]),
-    y: d3.scaleLinear()
+    y: this.pin["attrY"] ? this.renderOptions.scales.y : d3.scaleLinear()
          .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrY]; })))
          .range([this.canvas.height() - 10, 10]),
-    a: d3.scaleLinear()
+    a: this.pin["attrArea"] ? this.renderOptions.scales.a : d3.scaleLinear()
          .domain(d3.extent(data.map(function(d) { return d[attrSelectors.attrArea]; })))
          .range([5, 20])
   };
@@ -122,8 +122,8 @@ Gatherer.prototype.makeOptions = function (data) {
   };
 };
 
-Gatherer.prototype.pinBounds = function() {
-  this.pin = true;
+Gatherer.prototype.pinScale = function(attrName) {
+  this.pin[attrName] = true;
 };
 
 Gatherer.prototype.render = function () {
@@ -146,8 +146,8 @@ Gatherer.prototype.setData = function(data) {
   this.data = data;
 };
 
-Gatherer.prototype.unpinBounds = function () {
-  this.pin = false;
+Gatherer.prototype.unpinScale = function (attrName) {
+  this.pin[attrName] = false;
 };
 
 module.exports = Gatherer;
