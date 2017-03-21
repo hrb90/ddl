@@ -58,28 +58,35 @@ footer p {
   font-size: 14px;
 }
 
+#pos-filters label {
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
 .pg {
-  color: red;
+  background-color: #e51616;
+  color: white;
 }
 
 .sg {
-  color: orange;
+  background-color: #e59d16;
 }
 
 .sf {
-  color: yellow;
+  background-color: #e5e516;
 }
 
 .pf {
-  color: green;
+  background-color: #16e516;
 }
 
 .c {
-  color: blue;
+  background-color: #1616e5;
+  color: white;
 }
 
 #attrSelectorForms ul {
-  margin: 10px 30px;
+  margin: 10px 0;
 }
 
 #attrSelectorForms li {
