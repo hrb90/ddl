@@ -38,10 +38,9 @@ function circleUpdaterFactory(attrs,
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
   circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "grey" : "none";
+    return d.highlight ? "gold" : "none";
   });
   circleFactory.addAttributeSetter('stroke-width', function() { return 3; });
-  var zIdx = 0;
   circleFactory.addAttributeSetter('fill', colorPicker);
   circleFactory.addAttributeSetter('player',
   simpleAttrSetterFactory("playerId", function(x) { return x; }));
