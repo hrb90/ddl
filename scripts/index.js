@@ -91,8 +91,8 @@ function addClickers() {
   });
 }
 
-function addPinner(gatherer) {
-  var pinIcon = document.getElementById("pin-icon");
+function addPinner(attrName, gatherer) {
+  var pinIcon = document.getElementById(attrName);
   pinIcon.addEventListener("click", function() {
     if (pinIcon.className.includes("pinned")) {
       pinIcon.className = "fa fa-map-pin";
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
     newFilterForm: document.getElementById('new-filter-form'),
     highlightInput: document.getElementById('highlight-input')
   });
-  addPinner(gatherer);
+  // addPinner(gatherer);
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);

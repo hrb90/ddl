@@ -60,7 +60,7 @@ Gatherer.prototype.filter = function (data) {
 Gatherer.prototype.gatherAttributeSelectors = function () {
   var selections = {};
   [].forEach.call(this.attrSelectors, function (selector) {
-    selections[selector.id] = selector.value;
+    selections[selector.parentNode.id] = selector.value;
   });
   return selections;
 };
