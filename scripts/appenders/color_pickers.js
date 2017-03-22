@@ -1,16 +1,23 @@
 var positionPicker = function(player) {
+  var colorPairs = [];
   switch(player.position) {
     case "PG":
-      return "red";
+      colorPairs = ["red", "#e51616"];
+      break;
     case "SG":
-      return "orange";
+      colorPairs = ["orange", "#e59d16"];
+      break;
     case "SF":
-      return "yellow";
+      colorPairs = ["yellow", "#e5e516"];
+      break;
     case "PF":
-      return "green";
+      colorPairs = ["green", "#16e516"];
+      break;
     case "C":
-      return "blue";
+      colorPairs = ["blue", "#1616e5"];
+      break;
   }
+  return player.highlight ? colorPairs[0] : colorPairs[1];
 };
 
 module.exports = { positionPicker };
