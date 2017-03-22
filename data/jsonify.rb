@@ -50,7 +50,7 @@ end
 
 anuhliticks = []  # They're bullcrap, Erneh.
 
-(2016..2017).to_a.each do |year|
+(1980..2017).to_a.each do |year|
   players = {};
   ['ADV', 'PG'].each do |type|
     File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
@@ -69,6 +69,6 @@ anuhliticks = []  # They're bullcrap, Erneh.
   anuhliticks += players.values
 end
 
-File.open('./placeholder_data.json', 'w') do |f|
+File.open('./all_data.json', 'w') do |f|
   f.puts(anuhliticks.to_json)
 end
