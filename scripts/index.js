@@ -5,23 +5,26 @@ var TooltipFactories = require('./appenders/tooltip_factory');
 var Gatherer = require('./gatherer');
 var makeFilterSpan = require('./make_filter_span');
 var attributes = require('./attrs');
-var nbaData = require('../data/dev_data.json');
+var nbaData = require('../data/placeholder_data.json');
 
-function populateYearSelectors() {
+function populateYearSelectors(data) {
   var selectors = d3.selectAll(".season-selector");
-  d3.range(1980, 2018).forEach(function(year) {
+  var yearExtent = d3.extent(data, function(d){ return d.season; });
+  d3.range(yearExtent[0], yearExtent[1] + 1).forEach(function(year) {
     selectors.append("option")
       .attr("class", `yr${year}`)
       .attr("value", year)
       .text(`${year-1}-${year}`);
   });
 
+  var startYear = Math.max(yearExtent[0], yearExtent[1] - 5);
+
   d3.select("#start-season-selector")
-    .select(".yr2001")
+    .select(`.yr${startYear}`)
     .attr("selected", true);
 
   d3.select("#end-season-selector")
-    .select(".yr2017")
+    .select(`.yr${yearExtent[1]}`)
     .attr("selected", true);
 }
 
@@ -112,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var canvas = new DDLCanvas("chart");
   var attrSelectors = d3.selectAll('.attr-selector');
   populateSelectors(attrSelectors);
-  populateYearSelectors();
+  populateYearSelectors(nbaData);
   var gatherer = new Gatherer({
     main: circleUpdaterFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
@@ -128,5 +131,11 @@ document.addEventListener('DOMContentLoaded', function () {
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
+  d3.json("data/all_data.json", function(error, data){
+    if (!error) {
+      gatherer.setData(data);
+      populateYearSelectors(data);
+    }
+  });
   gatherer.render();
 });
