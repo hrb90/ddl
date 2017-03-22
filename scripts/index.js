@@ -91,16 +91,16 @@ function addClickers() {
   });
 }
 
-function addPinner(gatherer) {
-  var pinIcon = document.getElementById("pin-icon");
+function addPinner(attrName, gatherer) {
+  var pinIcon = document.getElementById(attrName).getElementsByTagName("i")[0];
   pinIcon.addEventListener("click", function() {
     if (pinIcon.className.includes("pinned")) {
       pinIcon.className = "fa fa-map-pin";
-      gatherer.unpinBounds();
+      gatherer.unpinScale(attrName);
       gatherer.render();
     } else {
       pinIcon.className = "fa fa-map-pin pinned";
-      gatherer.pinBounds();
+      gatherer.pinScale(attrName);
     }
   });
   document.getElementById('attrSelectorForms').addEventListener("change", function() {
@@ -122,7 +122,9 @@ document.addEventListener('DOMContentLoaded', function () {
     newFilterForm: document.getElementById('new-filter-form'),
     highlightInput: document.getElementById('highlight-input')
   });
-  addPinner(gatherer);
+  ["attrX",
+   "attrY",
+   "attrArea"].forEach(function(name) { addPinner(name, gatherer); });
   addClickers();
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);

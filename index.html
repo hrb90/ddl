@@ -33,18 +33,27 @@
             <ul>
               <li>
                 <label for="#attrX">X axis</label>
-                <select class="graph-selector attr-selector" id="attrX">
-                </select>
+                <div id="attrX">
+                  <select class="graph-selector attr-selector">
+                  </select>
+                  <i class="fa fa-map-pin" aria-hidden="true"></i>
+                </div>
               </li>
               <li>
                 <label for="#attrY">Y axis</label>
-                <select class="graph-selector attr-selector" id="attrY">
-                </select>
+                <div id="attrY">
+                  <select class="graph-selector attr-selector">
+                  </select>
+                  <i class="fa fa-map-pin" aria-hidden="true"></i>
+                </div>
               </li>
               <li>
                 <label for="#attrArea">Area</label>
-                <select class="graph-selector attr-selector" id="attrArea">
-                </select>
+                <div id="attrArea">
+                  <select class="graph-selector attr-selector">
+                  </select>
+                  <i class="fa fa-map-pin pinned" aria-hidden="true"></i>
+                </div>
               </li>
             </ul>
           </div>
@@ -103,7 +112,6 @@
         <div id="chart-container">
           <svg id="chart" width="970" height="560">
           </svg>
-          <i id="pin-icon" class="fa fa-map-pin" aria-hidden="true"></i>
         </div>
       </div>
       <footer>
