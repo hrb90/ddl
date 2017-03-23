@@ -4,7 +4,7 @@ require 'open-uri'
 require 'byebug'
 
 
-(1980..2014).to_a.each do |year|
+(2017..2017).to_a.each do |year|
   [{short: "ADV", long: "advanced"}, {short: "PG", long: "per_game"}].each do |type|
     doc = Nokogiri::HTML(open("http://www.basketball-reference.com/leagues/NBA_#{year}_#{type[:long]}.html"))
     rows = doc.search('table > tbody > tr.full_table')
