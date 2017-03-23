@@ -49638,8 +49638,9 @@ var makeFilterSpan = __webpack_require__(2);
 var attributes = __webpack_require__(1);
 var nbaData = __webpack_require__(4);
 
-function populateYearSelectors(data) {
+function populateYearSelectors(data, startYear, endYear) {
   var selectors = d3.selectAll(".season-selector");
+  selectors.selectAll("option").remove();
   var yearExtent = d3.extent(data, function(d){ return d.season; });
   d3.range(yearExtent[0], yearExtent[1] + 1).forEach(function(year) {
     selectors.append("option")
@@ -49648,14 +49649,12 @@ function populateYearSelectors(data) {
       .text(`${year-1}-${year}`);
   });
 
-  var startYear = Math.max(yearExtent[0], yearExtent[1] - 5);
-
   d3.select("#start-season-selector")
     .select(`.yr${startYear}`)
     .attr("selected", true);
 
   d3.select("#end-season-selector")
-    .select(`.yr${yearExtent[1]}`)
+    .select(`.yr${endYear}`)
     .attr("selected", true);
 }
 
@@ -49746,7 +49745,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var canvas = new DDLCanvas("chart");
   var attrSelectors = d3.selectAll('.attr-selector');
   populateSelectors(attrSelectors);
-  populateYearSelectors(nbaData);
+  populateYearSelectors(nbaData, 2016, 2017);
   var gatherer = new Gatherer({
     main: circleUpdaterFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
@@ -49765,7 +49764,7 @@ document.addEventListener('DOMContentLoaded', function () {
   d3.json("data/all_data.json", function(error, data){
     if (!error) {
       gatherer.setData(data);
-      populateYearSelectors(data);
+      populateYearSelectors(data, 2016, 2017);
     }
   });
   gatherer.render();
