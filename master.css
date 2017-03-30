@@ -195,3 +195,7 @@ i.fa-map-pin.pinned {
   width: 90vw;
   height: calc(100vh - 30px);
 }
+
+#highlight-input {
+  width: 100%;
+}
