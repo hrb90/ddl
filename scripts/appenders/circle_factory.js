@@ -43,7 +43,7 @@ function circleUpdaterFactory(attrs,
   circleFactory.addAttributeSetter('player',
   simpleAttrSetterFactory("playerId", function(x) { return x; }));
   circleFactory.addAttributeSetter('opacity', function(d) {
-    return d.highlight ? 0.8 : 0.5;
+    return d.highlight ? 0.8 : 0.6;
   } );
   circleFactory.addAttributeSetter('class', function(d) {
     return d.highlight ? "ddl-element highlighted" : "ddl-element";
