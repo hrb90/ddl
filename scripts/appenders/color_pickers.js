@@ -20,4 +20,16 @@ var positionPicker = function(player) {
   return player.highlight ? colorPairs[0] : colorPairs[1];
 };
 
-module.exports = { positionPicker };
+var strokePicker = function(player) {
+  var colorPairs;
+  switch(player.position) {
+    case "C":
+      colorPairs = ["gold", "none"];
+      break;
+    default:
+      colorPairs = ["black", "none"];
+  }
+  return player.highlight ? colorPairs[0] : colorPairs[1];
+};
+
+module.exports = { positionPicker, strokePicker };
