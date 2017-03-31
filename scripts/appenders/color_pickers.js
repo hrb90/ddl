@@ -14,7 +14,7 @@ var positionPicker = function(player) {
       colorPairs = ["green", "#16e516"];
       break;
     case "C":
-      colorPairs = ["blue", "#1616e5"];
+      colorPairs = ["blue", "#3264e5"];
       break;
   }
   return player.highlight ? colorPairs[0] : colorPairs[1];
