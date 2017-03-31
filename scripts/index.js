@@ -56,16 +56,6 @@ function populateSelectors(selectors) {
 }
 
 function addClickers() {
-  document.getElementById("attr-selector-clicker").addEventListener("click", function() {
-    var forms = document.getElementById("attrSelectorForms");
-    forms.className = forms.className === "hidden" ? "" : "hidden";
-  });
-
-  document.getElementById("filter-clicker").addEventListener("click", function() {
-    var filters = document.getElementById("filters");
-    filters.className = filters.className === "hidden" ? "" : "hidden";
-  });
-
   document.getElementById("new-filter-button").addEventListener("click", function(e) {
     document.getElementById("new-filter-form").className = "";
   });

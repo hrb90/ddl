@@ -22,15 +22,18 @@
       <p>
         Interactive visualization of NBA statistics
         <a href="#" id="glossary-link">Glossary</a>
-        <a href="#" id="howto-link">How to Use</a>
+        <a href="#" id="howto-link">Help</a>
       </p>
     </header>
     <div id="main">
       <div id="main-no-footer">
         <aside id="sidebar">
-          <span class="expander" id="attr-selector-clicker">Graph Properties</span>
+          <span id="attr-selector-clicker">Graph Properties</span>
           <div id="attrSelectorForms" class="">
             <ul>
+              <li>
+                <span id="pin-helper">Pin</span>
+              </li>
               <li>
                 <label for="#attrX">X axis</label>
                 <div id="attrX">
@@ -57,7 +60,7 @@
               </li>
             </ul>
           </div>
-          <span class="expander" id="filter-clicker">Filters</span>
+          <span id="filter-clicker">Filters</span>
           <div id="filter-container">
             <div id="filters" class="">
               <section id="pos-filters">
@@ -107,7 +110,10 @@
               <input type="Submit" value="Add Filter">
             </form>
           </div>
-          <input id="highlight-input" placeholder="Highlight a player"></input>
+          <label for="highlight-input">Highlight a Player</label>
+          <section>
+            <input id="highlight-input" placeholder="Type a name ('lebron', 'Yao Ming')"></input>
+          </section>
         </aside>
         <div id="chart-container">
           <svg id="chart" width="970" height="560">
@@ -199,6 +205,9 @@
       </p>
       <p>
         You can also change how the data is filtered by using the tools in the "Filters" section of the sidebar. You can easily change the positions or seasons charted with the provided checkboxes and dropdowns. You can also add custom numeric filters by clicking the "Add Filter" button.
+      </p>
+      <p>
+        If you want to add more filters but don't want to change the scales, you can use the "pin" buttons next to the dropdown lists in the Graph Properties section.
       </p>
       <p>
         You can highlight a player's seasons on the chart in grey by typing (part of) their name into the provided text box.
