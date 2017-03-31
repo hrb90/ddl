@@ -6,7 +6,7 @@ var attrMap = require('../attrs');
 
 function circleUpdaterFactory(attrs,
           attrHighlight,
-          colorPicker = colorPickers.positionPicker) {
+          fillPicker = colorPickers.positionPicker) {
   var attrX = attrs.attrX;
   var attrY = attrs.attrY;
   var attrArea = attrs.attrArea;
@@ -37,14 +37,14 @@ function circleUpdaterFactory(attrs,
     simpleAttrSetterFactory(attrY, function(y, options) { return options.yScale(y); }));
   circleFactory.addAttributeSetter('r',
     simpleAttrSetterFactory(attrArea, function(a, options) { return options.aScale(a); }));
-  circleFactory.addAttributeSetter('stroke', function(d) {
-    return d.highlight ? "gold" : "none";
-  });
+  circleFactory.addAttributeSetter('stroke', colorPickers.strokePicker);
   circleFactory.addAttributeSetter('stroke-width', function() { return 3; });
-  circleFactory.addAttributeSetter('fill', colorPicker);
+  circleFactory.addAttributeSetter('fill', fillPicker);
   circleFactory.addAttributeSetter('player',
   simpleAttrSetterFactory("playerId", function(x) { return x; }));
-  circleFactory.addAttributeSetter('opacity', function() { return 0.8; } );
+  circleFactory.addAttributeSetter('opacity', function(d) {
+    return d.highlight ? 0.8 : 0.6;
+  } );
   circleFactory.addAttributeSetter('class', function(d) {
     return d.highlight ? "ddl-element highlighted" : "ddl-element";
   });

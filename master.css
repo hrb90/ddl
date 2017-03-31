@@ -94,6 +94,10 @@ footer p {
   justify-content: space-between;
 }
 
+#attrSelectorForms li:first-of-type {
+  margin: 0 0 2px 0;
+}
+
 #pos-filters {
   display: flex;
   flex-wrap: wrap;
@@ -108,10 +112,6 @@ footer p {
 
 .posFilter {
   margin-right: 15px;
-}
-
-.expander {
-  cursor: pointer;
 }
 
 #chart {
@@ -198,4 +198,15 @@ i.fa-map-pin.pinned {
 .full-page {
   width: 90vw;
   height: calc(100vh - 30px);
+}
+
+#highlight-input {
+  width: 100%;
+}
+
+#pin-helper {
+  font-size: 12px;
+  margin-bottom: 0px!important;
+  text-align: right;
+  width: 100%;
 }
