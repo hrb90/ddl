@@ -9,6 +9,7 @@ var nbaData = require('../data/placeholder_data.json');
 
 
 function deserializeView(viewObject) {
+  console.log(viewObject);
   Object.keys(viewObject.attrSelectors).forEach(function(name) {
     d3.select(`#${name}`)
       .select(`.${viewObject.attrSelectors[name]}`)

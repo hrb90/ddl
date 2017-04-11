@@ -49915,6 +49915,7 @@ var nbaData = __webpack_require__(4);
 
 
 function deserializeView(viewObject) {
+  console.log(viewObject);
   Object.keys(viewObject.attrSelectors).forEach(function(name) {
     d3.select(`#${name}`)
       .select(`.${viewObject.attrSelectors[name]}`)
