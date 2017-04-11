@@ -2,6 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <script src="https://www.gstatic.com/firebasejs/3.7.5/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCEnl0EslCZM3HcTJt31uj2KPG_CLJ0FgM",
+        databaseURL: "https://data-dont-lie.firebaseio.com",
+        projectId: "data-dont-lie",
+      };
+      firebase.initializeApp(config);
+      var database = firebase.database();
+    </script>
     <script src="./bundle.js" charset="utf-8"></script>
     <script src="https://use.fontawesome.com/c21ff7d00f.js"></script>
     <script>

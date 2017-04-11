@@ -8,3 +8,6 @@ node_modules/*
 
 # Ignore source map
 bundle.js.map
+
+# Ignore all logs
+*.log

@@ -49656,6 +49656,15 @@ module.exports = DDLCanvas;
 var d3 = __webpack_require__(0);
 var makeFilterSpan = __webpack_require__(2);
 var attrs = __webpack_require__(1);
+var alphabet = __webpack_require__(12);
+
+function makeRandomSlug() {
+  var slug = "";
+  for (var i = 0; i < 8; i++) {
+    slug = slug.concat(alphabet[Math.floor(alphabet.length * Math.random())]);
+  }
+  return slug;
+}
 
 function makeFilterFunction(filter) {
   switch (filter.type) {
@@ -49818,10 +49827,12 @@ Gatherer.prototype.addHighlights = function(data, highlight) {
 
 Gatherer.prototype.serializeToUrl = function() {
   this.gatherFilters();
-  return `www.harrisonrbrown.com/ddl?v=${encodeURIComponent(JSON.stringify({
+  var slug = makeRandomSlug();
+  database.ref(slug).set({
     "attrSelectors": this.gatherAttributeSelectors(),
     "filters": this.filters
-  }))}`;
+  });
+  return `www.harrisonrbrown.com/ddl?v=${slug}`;
 }
 
 Gatherer.prototype.setData = function(data) {
@@ -49903,17 +49914,16 @@ var attributes = __webpack_require__(1);
 var nbaData = __webpack_require__(4);
 
 
-function deserializeView(viewString) {
-  var gatheredData = JSON.parse(viewString);
-  Object.keys(gatheredData.attrSelectors).forEach(function(name) {
+function deserializeView(viewObject) {
+  Object.keys(viewObject.attrSelectors).forEach(function(name) {
     d3.select(`#${name}`)
-      .select(`.${gatheredData.attrSelectors[name]}`)
+      .select(`.${viewObject.attrSelectors[name]}`)
       .attr("selected", true);
   });
   let posFilters = d3.selectAll('.posFilter');
   posFilters.property("checked", false);
   d3.selectAll('.span-filter').remove();
-  gatheredData.filters.forEach(function(filter) {
+  viewObject.filters.forEach(function(filter) {
     switch(filter.type) {
       case "position":
         filter.data.list.forEach(pos => {
@@ -49953,7 +49963,7 @@ function loadView() {
     return b;
   })(window.location.search.substr(1).split('&'));
   if(qs.v) {
-    deserializeView(qs.v);
+    database.ref(qs.v).once().then(deserializeView);
   };
 }
 
@@ -50083,6 +50093,26 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   gatherer.render();
 });
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * alphabet <https://github.com/jonschlinkert/alphabet>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT license.
+ */
+
+
+
+module.exports = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ];
+
+module.exports.lower = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ];
+module.exports.upper = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ];
 
 
 /***/ })

@@ -8,17 +8,16 @@ var attributes = require('./attrs');
 var nbaData = require('../data/placeholder_data.json');
 
 
-function deserializeView(viewString) {
-  var gatheredData = JSON.parse(viewString);
-  Object.keys(gatheredData.attrSelectors).forEach(function(name) {
+function deserializeView(viewObject) {
+  Object.keys(viewObject.attrSelectors).forEach(function(name) {
     d3.select(`#${name}`)
-      .select(`.${gatheredData.attrSelectors[name]}`)
+      .select(`.${viewObject.attrSelectors[name]}`)
       .attr("selected", true);
   });
   let posFilters = d3.selectAll('.posFilter');
   posFilters.property("checked", false);
   d3.selectAll('.span-filter').remove();
-  gatheredData.filters.forEach(function(filter) {
+  viewObject.filters.forEach(function(filter) {
     switch(filter.type) {
       case "position":
         filter.data.list.forEach(pos => {
@@ -58,7 +57,7 @@ function loadView() {
     return b;
   })(window.location.search.substr(1).split('&'));
   if(qs.v) {
-    deserializeView(qs.v);
+    database.ref(qs.v).once().then(deserializeView);
   };
 }
 

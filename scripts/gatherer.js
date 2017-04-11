@@ -1,6 +1,15 @@
 var d3 = require('d3');
 var makeFilterSpan = require('./make_filter_span');
 var attrs = require('./attrs');
+var alphabet = require('alphabet');
+
+function makeRandomSlug() {
+  var slug = "";
+  for (var i = 0; i < 8; i++) {
+    slug = slug.concat(alphabet[Math.floor(alphabet.length * Math.random())]);
+  }
+  return slug;
+}
 
 function makeFilterFunction(filter) {
   switch (filter.type) {
@@ -163,10 +172,12 @@ Gatherer.prototype.addHighlights = function(data, highlight) {
 
 Gatherer.prototype.serializeToUrl = function() {
   this.gatherFilters();
-  return `www.harrisonrbrown.com/ddl?v=${encodeURIComponent(JSON.stringify({
+  var slug = makeRandomSlug();
+  database.ref(slug).set({
     "attrSelectors": this.gatherAttributeSelectors(),
     "filters": this.filters
-  }))}`;
+  });
+  return `www.harrisonrbrown.com/ddl?v=${slug}`;
 }
 
 Gatherer.prototype.setData = function(data) {
