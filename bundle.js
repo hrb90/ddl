@@ -49832,7 +49832,7 @@ Gatherer.prototype.serializeToUrl = function() {
     "attrSelectors": this.gatherAttributeSelectors(),
     "filters": this.filters
   });
-  return `www.harrisonrbrown.com/ddl?v=${slug}`;
+  return `www.harrisonrbrown.com/ddl/index.html?v=${slug}`;
 }
 
 Gatherer.prototype.setData = function(data) {
@@ -49963,7 +49963,7 @@ function loadView() {
     return b;
   })(window.location.search.substr(1).split('&'));
   if(qs.v) {
-    database.ref(qs.v).once().then(deserializeView);
+    database.ref(qs.v).once('value').then(deserializeView);
   };
 }
 

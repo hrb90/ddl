@@ -57,7 +57,7 @@ function loadView() {
     return b;
   })(window.location.search.substr(1).split('&'));
   if(qs.v) {
-    database.ref(qs.v).once().then(deserializeView);
+    database.ref(qs.v).once('value').then(deserializeView);
   };
 }
 

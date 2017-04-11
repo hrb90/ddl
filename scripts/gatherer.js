@@ -177,7 +177,7 @@ Gatherer.prototype.serializeToUrl = function() {
     "attrSelectors": this.gatherAttributeSelectors(),
     "filters": this.filters
   });
-  return `www.harrisonrbrown.com/ddl?v=${slug}`;
+  return `www.harrisonrbrown.com/ddl/index.html?v=${slug}`;
 }
 
 Gatherer.prototype.setData = function(data) {
