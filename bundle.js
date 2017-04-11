@@ -16686,17 +16686,8 @@ function makeFilterSpan(attrName, comparator, threshold) {
   var attrMap = Object.assign({}, attrs.basicAttributes, attrs.filterAttributes);
   filterSpan.className = "span-filter";
   filterSpan.innerText = `${attrMap[attrName]} ${comparator} ${threshold}`;
-  filterSpan.data = { filter: function (d) {
-      switch(comparator) {
-        case "<=":
-          return d[attrName] <= (+threshold);
-        case "=":
-          return d[attrName] === (+threshold);
-        case ">=":
-          return d[attrName] >= (+threshold);
-      }
-    }
-  };
+  filterSpan.data = { type: "comparison", data :
+    { attribute: attrName, comparator: comparator, threshold: threshold } };
   return filterSpan;
 }
 
@@ -49666,6 +49657,24 @@ var d3 = __webpack_require__(0);
 var makeFilterSpan = __webpack_require__(2);
 var attrs = __webpack_require__(1);
 
+function makeFilterFunction(filter) {
+  switch (filter.type) {
+    case "position":
+      return function(d) { return filter.data.list.includes(d.position) };
+    default:
+      switch(filter.data.comparator) {
+        case ">=":
+          return function(d) { return d[filter.data.attribute] >= filter.data.threshold };
+        case "=":
+          return function(d) { return d[filter.data.attribute] === filter.data.threshold };
+        case "<=":
+          return function(d) { return d[filter.data.attribute] <= filter.data.threshold };
+        default:
+          throw new Error("Invalid comparator!");
+      }
+  }
+}
+
 function Gatherer(factories, canvas, domElements) {
   this.factories = factories;
   this.canvas = canvas;
@@ -49715,9 +49724,10 @@ Gatherer.prototype.addListeners = function () {
 
 
 Gatherer.prototype.filter = function (data) {
-  var that = this;
+  console.log(this.filters);
+  var filterFunctions = this.filters.map(makeFilterFunction);
   return data.filter(function(d) {
-    return that.filters.every(function(f) { return f(d); } );
+    return filterFunctions.every(function(f) { return f(d); } );
   });
 };
 
@@ -49733,13 +49743,13 @@ Gatherer.prototype.gatherFilters = function () {
   var posFilters = document.getElementsByClassName('posFilter');
   var posList = [];
   [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
-  var filterList = [ function(d) { return posList.includes(d.position); } ];
+  var filterList = [ { type: "position", data: { list: posList }}]
   var minYearFilter = document.getElementById('start-season-selector');
   var maxYearFilter = document.getElementById('end-season-selector');
-  filterList.push(function(d) { return d.season >= parseInt(minYearFilter.value); });
-  filterList.push(function(d) { return d.season <= parseInt(maxYearFilter.value); });
+  filterList.push({ type: "comparison", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
+  filterList.push({ type: "comparison", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
   var spanFilters = document.getElementsByClassName('span-filter');
-  [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
+  [].forEach.call(spanFilters, function(el) { filterList.push(el.data); });
   this.filters = filterList;
 };
 
