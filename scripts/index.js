@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
   addClickers();
   document.getElementById("make-url").addEventListener("click", function() {
     document.getElementById("url").value = gatherer.serializeToUrl();
+    document.getElementById("url").select();
   });
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
