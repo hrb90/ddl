@@ -155,7 +155,6 @@ Gatherer.prototype.pinScale = function(attrName) {
 
 Gatherer.prototype.render = function () {
   this.gatherFilters();
-  console.log(this.gatherAttributeSelectors());
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);

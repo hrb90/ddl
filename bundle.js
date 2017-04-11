@@ -49810,7 +49810,6 @@ Gatherer.prototype.pinScale = function(attrName) {
 
 Gatherer.prototype.render = function () {
   this.gatherFilters();
-  console.log(this.gatherAttributeSelectors());
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
@@ -49947,7 +49946,7 @@ function deserializeView(viewObject) {
   })
 }
 
-function loadView() {
+function loadView(callback) {
   // Parse query string: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
   var qs = (function(a) {
     if (a == "") return {};
@@ -49963,7 +49962,10 @@ function loadView() {
     return b;
   })(window.location.search.substr(1).split('&'));
   if(qs.v) {
-    database.ref(qs.v).once('value').then(function(v) { deserializeView(v.val()); });
+    database.ref(qs.v).once('value').then(function(v) {
+      deserializeView(v.val());
+      callback();
+    });
   };
 }
 
@@ -50088,8 +50090,7 @@ document.addEventListener('DOMContentLoaded', function () {
       gatherer.setData(data);
       populateYearSelectors(data, 2016, 2017);
     }
-    loadView();
-    gatherer.render();
+    loadView(gatherer.render);
   });
   gatherer.render();
 });
