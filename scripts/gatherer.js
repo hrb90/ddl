@@ -1,6 +1,33 @@
 var d3 = require('d3');
 var makeFilterSpan = require('./make_filter_span');
 var attrs = require('./attrs');
+var alphabet = require('alphabet');
+
+function makeRandomSlug() {
+  var slug = "";
+  for (var i = 0; i < 8; i++) {
+    slug = slug.concat(alphabet[Math.floor(alphabet.length * Math.random())]);
+  }
+  return slug;
+}
+
+function makeFilterFunction(filter) {
+  switch (filter.type) {
+    case "position":
+      return function(d) { return filter.data.list.includes(d.position) };
+    default:
+      switch(filter.data.comparator) {
+        case ">=":
+          return function(d) { return d[filter.data.attribute] >= filter.data.threshold };
+        case "=":
+          return function(d) { return d[filter.data.attribute] === filter.data.threshold };
+        case "<=":
+          return function(d) { return d[filter.data.attribute] <= filter.data.threshold };
+        default:
+          throw new Error("Invalid comparator!");
+      }
+  }
+}
 
 function Gatherer(factories, canvas, domElements) {
   this.factories = factories;
@@ -51,9 +78,9 @@ Gatherer.prototype.addListeners = function () {
 
 
 Gatherer.prototype.filter = function (data) {
-  var that = this;
+  var filterFunctions = this.filters.map(makeFilterFunction);
   return data.filter(function(d) {
-    return that.filters.every(function(f) { return f(d); } );
+    return filterFunctions.every(function(f) { return f(d); } );
   });
 };
 
@@ -69,13 +96,13 @@ Gatherer.prototype.gatherFilters = function () {
   var posFilters = document.getElementsByClassName('posFilter');
   var posList = [];
   [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
-  var filterList = [ function(d) { return posList.includes(d.position); } ];
+  var filterList = [ { type: "position", data: { list: posList }}]
   var minYearFilter = document.getElementById('start-season-selector');
   var maxYearFilter = document.getElementById('end-season-selector');
-  filterList.push(function(d) { return d.season >= parseInt(minYearFilter.value); });
-  filterList.push(function(d) { return d.season <= parseInt(maxYearFilter.value); });
+  filterList.push({ type: "minSeason", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
+  filterList.push({ type: "maxSeason", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
   var spanFilters = document.getElementsByClassName('span-filter');
-  [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
+  [].forEach.call(spanFilters, function(el) { filterList.push(el.data); });
   this.filters = filterList;
 };
 
@@ -128,6 +155,7 @@ Gatherer.prototype.pinScale = function(attrName) {
 
 Gatherer.prototype.render = function () {
   this.gatherFilters();
+  console.log(this.gatherAttributeSelectors());
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
@@ -141,6 +169,16 @@ Gatherer.prototype.addHighlights = function(data, highlight) {
   var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
   return newData;
 };
+
+Gatherer.prototype.serializeToUrl = function() {
+  this.gatherFilters();
+  var slug = makeRandomSlug();
+  database.ref(slug).set({
+    "attrSelectors": this.gatherAttributeSelectors(),
+    "filters": this.filters
+  });
+  return `www.harrisonrbrown.com/ddl?v=${slug}`;
+}
 
 Gatherer.prototype.setData = function(data) {
   this.data = data;

@@ -16686,17 +16686,8 @@ function makeFilterSpan(attrName, comparator, threshold) {
   var attrMap = Object.assign({}, attrs.basicAttributes, attrs.filterAttributes);
   filterSpan.className = "span-filter";
   filterSpan.innerText = `${attrMap[attrName]} ${comparator} ${threshold}`;
-  filterSpan.data = { filter: function (d) {
-      switch(comparator) {
-        case "<=":
-          return d[attrName] <= (+threshold);
-        case "=":
-          return d[attrName] === (+threshold);
-        case ">=":
-          return d[attrName] >= (+threshold);
-      }
-    }
-  };
+  filterSpan.data = { type: "span", data :
+    { attribute: attrName, comparator: comparator, threshold: threshold } };
   return filterSpan;
 }
 
@@ -49665,6 +49656,33 @@ module.exports = DDLCanvas;
 var d3 = __webpack_require__(0);
 var makeFilterSpan = __webpack_require__(2);
 var attrs = __webpack_require__(1);
+var alphabet = __webpack_require__(12);
+
+function makeRandomSlug() {
+  var slug = "";
+  for (var i = 0; i < 8; i++) {
+    slug = slug.concat(alphabet[Math.floor(alphabet.length * Math.random())]);
+  }
+  return slug;
+}
+
+function makeFilterFunction(filter) {
+  switch (filter.type) {
+    case "position":
+      return function(d) { return filter.data.list.includes(d.position) };
+    default:
+      switch(filter.data.comparator) {
+        case ">=":
+          return function(d) { return d[filter.data.attribute] >= filter.data.threshold };
+        case "=":
+          return function(d) { return d[filter.data.attribute] === filter.data.threshold };
+        case "<=":
+          return function(d) { return d[filter.data.attribute] <= filter.data.threshold };
+        default:
+          throw new Error("Invalid comparator!");
+      }
+  }
+}
 
 function Gatherer(factories, canvas, domElements) {
   this.factories = factories;
@@ -49715,9 +49733,9 @@ Gatherer.prototype.addListeners = function () {
 
 
 Gatherer.prototype.filter = function (data) {
-  var that = this;
+  var filterFunctions = this.filters.map(makeFilterFunction);
   return data.filter(function(d) {
-    return that.filters.every(function(f) { return f(d); } );
+    return filterFunctions.every(function(f) { return f(d); } );
   });
 };
 
@@ -49733,13 +49751,13 @@ Gatherer.prototype.gatherFilters = function () {
   var posFilters = document.getElementsByClassName('posFilter');
   var posList = [];
   [].forEach.call(posFilters, function(el) { if (el.checked) posList.push(el.value); });
-  var filterList = [ function(d) { return posList.includes(d.position); } ];
+  var filterList = [ { type: "position", data: { list: posList }}]
   var minYearFilter = document.getElementById('start-season-selector');
   var maxYearFilter = document.getElementById('end-season-selector');
-  filterList.push(function(d) { return d.season >= parseInt(minYearFilter.value); });
-  filterList.push(function(d) { return d.season <= parseInt(maxYearFilter.value); });
+  filterList.push({ type: "minSeason", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
+  filterList.push({ type: "maxSeason", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
   var spanFilters = document.getElementsByClassName('span-filter');
-  [].forEach.call(spanFilters, function(el) { filterList.push(el.data.filter); });
+  [].forEach.call(spanFilters, function(el) { filterList.push(el.data); });
   this.filters = filterList;
 };
 
@@ -49792,6 +49810,7 @@ Gatherer.prototype.pinScale = function(attrName) {
 
 Gatherer.prototype.render = function () {
   this.gatherFilters();
+  console.log(this.gatherAttributeSelectors());
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
@@ -49805,6 +49824,16 @@ Gatherer.prototype.addHighlights = function(data, highlight) {
   var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
   return newData;
 };
+
+Gatherer.prototype.serializeToUrl = function() {
+  this.gatherFilters();
+  var slug = makeRandomSlug();
+  database.ref(slug).set({
+    "attrSelectors": this.gatherAttributeSelectors(),
+    "filters": this.filters
+  });
+  return `www.harrisonrbrown.com/ddl?v=${slug}`;
+}
 
 Gatherer.prototype.setData = function(data) {
   this.data = data;
@@ -49883,6 +49912,60 @@ var Gatherer = __webpack_require__(8);
 var makeFilterSpan = __webpack_require__(2);
 var attributes = __webpack_require__(1);
 var nbaData = __webpack_require__(4);
+
+
+function deserializeView(viewObject) {
+  Object.keys(viewObject.attrSelectors).forEach(function(name) {
+    d3.select(`#${name}`)
+      .select(`.${viewObject.attrSelectors[name]}`)
+      .attr("selected", true);
+  });
+  let posFilters = d3.selectAll('.posFilter');
+  posFilters.property("checked", false);
+  d3.selectAll('.span-filter').remove();
+  viewObject.filters.forEach(function(filter) {
+    switch(filter.type) {
+      case "position":
+        filter.data.list.forEach(pos => {
+          d3.select(`#chk${pos}`).property("checked", true);
+        })
+        break;
+      case "minSeason":
+        d3.select("#start-season-selector")
+          .select(`.yr${filter.data.threshold}`)
+          .attr("selected", true);
+        break;
+      case "maxSeason":
+        d3.select("#end-season-selector")
+          .select(`.yr${filter.data.threshold}`)
+          .attr("selected", true);
+        break;
+      case "span":
+        document.getElementById("span-filter-container").append(makeFilterSpan(filter.data.attribute, filter.data.comparator, filter.data.threshold));
+        break;
+    }
+  })
+}
+
+function loadView() {
+  // Parse query string: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  var qs = (function(a) {
+    if (a == "") return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i)
+    {
+        var p=a[i].split('=', 2);
+        if (p.length == 1)
+            b[p[0]] = "";
+        else
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+    return b;
+  })(window.location.search.substr(1).split('&'));
+  if(qs.v) {
+    database.ref(qs.v).once().then(deserializeView);
+  };
+}
 
 function populateYearSelectors(data, startYear, endYear) {
   var selectors = d3.selectAll(".season-selector");
@@ -49995,6 +50078,9 @@ document.addEventListener('DOMContentLoaded', function () {
    "attrY",
    "attrArea"].forEach(function(name) { addPinner(name, gatherer); });
   addClickers();
+  document.getElementById("make-url").addEventListener("click", function() {
+    document.getElementById("url").value = gatherer.serializeToUrl();
+  });
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
   d3.json("data/all_data.json", function(error, data){
@@ -50002,9 +50088,31 @@ document.addEventListener('DOMContentLoaded', function () {
       gatherer.setData(data);
       populateYearSelectors(data, 2016, 2017);
     }
+    loadView();
+    gatherer.render();
   });
   gatherer.render();
 });
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * alphabet <https://github.com/jonschlinkert/alphabet>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT license.
+ */
+
+
+
+module.exports = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ];
+
+module.exports.lower = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ];
+module.exports.upper = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ];
 
 
 /***/ })

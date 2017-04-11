@@ -2,6 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <script src="https://www.gstatic.com/firebasejs/3.7.5/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCEnl0EslCZM3HcTJt31uj2KPG_CLJ0FgM",
+        databaseURL: "https://data-dont-lie.firebaseio.com",
+        projectId: "data-dont-lie",
+      };
+      firebase.initializeApp(config);
+      var database = firebase.database();
+    </script>
     <script src="./bundle.js" charset="utf-8"></script>
     <script src="https://use.fontawesome.com/c21ff7d00f.js"></script>
     <script>
@@ -66,23 +77,23 @@
               <section id="pos-filters">
                 <div>
                   <label for="chkPG" class="pg">PG</label>
-                  <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked>
+                  <input class="posFilter" type="checkbox" value="PG" id="chkPG" checked="true">
                 </div>
                 <div>
                   <label for="chkSG" class="sg">SG</label>
-                  <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked>
+                  <input class="posFilter" type="checkbox" value="SG" id="chkSG" checked="true">
                 </div>
                 <div>
                   <label for="chkSF" class="sf">SF</label>
-                  <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked>
+                  <input class="posFilter" type="checkbox" value="SF" id="chkSF" checked="true">
                 </div>
                 <div>
                   <label for="chkPF" class="pf">PF</label>
-                  <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked>
+                  <input class="posFilter" type="checkbox" value="PF" id="chkPF" checked="true">
                 </div>
                 <div>
                   <label for="chkC" class="c">C</label>
-                  <input class="posFilter" type="checkbox" value="C" id="chkC" checked>
+                  <input class="posFilter" type="checkbox" value="C" id="chkC" checked="true">
                 </div>
               </section>
               <section>
@@ -113,6 +124,10 @@
           <label for="highlight-input">Highlight a Player</label>
           <section>
             <input id="highlight-input" placeholder="Type a name ('lebron', 'Yao Ming')"></input>
+          </section>
+          <section>
+            <button id="make-url">Get a permanent link</button>
+            <input id="url" type="text">
           </section>
         </aside>
         <div id="chart-container">
