@@ -48,27 +48,36 @@ def transform_player_pg(row)
   new_row
 end
 
-anuhliticks = []  # They're bullcrap, Erneh.
 
-(1980..2017).to_a.each do |year|
-  players = {};
-  ['ADV', 'PG'].each do |type|
-    File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
-      csv = CSV.new(datafile, headers: true)
-      csv.to_a.each do |row|
-        if type == 'ADV'
-          data = transform_player_adv(row)
-          players[data["playerId"]] = data.merge({season: year})
-        else
-          data = transform_player_pg(row)
-          players[data["playerId"]] = players[data["playerId"]].merge(data)
+def make_json(years)
+  anuhliticks = []  # They're bullcrap, Erneh.
+
+  years.each do |year|
+    players = {};
+    ['ADV', 'PG'].each do |type|
+      File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
+        csv = CSV.new(datafile, headers: true)
+        csv.to_a.each do |row|
+          if type == 'ADV'
+            data = transform_player_adv(row)
+            players[data["playerId"]] = data.merge({season: year})
+          else
+            data = transform_player_pg(row)
+            players[data["playerId"]] = players[data["playerId"]].merge(data)
+          end
         end
       end
     end
+    anuhliticks += players.values
   end
-  anuhliticks += players.values
+
+  anuhliticks.to_json
 end
 
 File.open('./all_data.json', 'w') do |f|
-  f.puts(anuhliticks.to_json)
+  f.puts(make_json((1980..2017).to_a))
+end
+
+File.open('./placeholder_data.json', 'w') do |f|
+  f.puts(make_json((2016..2017).to_a))
 end
