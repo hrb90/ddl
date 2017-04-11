@@ -49915,7 +49915,6 @@ var nbaData = __webpack_require__(4);
 
 
 function deserializeView(viewObject) {
-  console.log(viewObject);
   Object.keys(viewObject.attrSelectors).forEach(function(name) {
     d3.select(`#${name}`)
       .select(`.${viewObject.attrSelectors[name]}`)
@@ -49964,7 +49963,7 @@ function loadView() {
     return b;
   })(window.location.search.substr(1).split('&'));
   if(qs.v) {
-    database.ref(qs.v).once('value').then(deserializeView);
+    database.ref(qs.v).once('value').then(function(v) { deserializeView(v.val()); });
   };
 }
 
