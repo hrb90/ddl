@@ -7,6 +7,61 @@ var makeFilterSpan = require('./make_filter_span');
 var attributes = require('./attrs');
 var nbaData = require('../data/placeholder_data.json');
 
+
+function deserializeView(viewString) {
+  var gatheredData = JSON.parse(viewString);
+  Object.keys(gatheredData.attrSelectors).forEach(function(name) {
+    d3.select(`#${name}`)
+      .select(`.${gatheredData.attrSelectors[name]}`)
+      .attr("selected", true);
+  });
+  let posFilters = d3.selectAll('.posFilter');
+  posFilters.property("checked", false);
+  d3.selectAll('.span-filter').remove();
+  gatheredData.filters.forEach(function(filter) {
+    switch(filter.type) {
+      case "position":
+        filter.data.list.forEach(pos => {
+          d3.select(`#chk${pos}`).property("checked", true);
+        })
+        break;
+      case "minSeason":
+        d3.select("#start-season-selector")
+          .select(`.yr${filter.data.threshold}`)
+          .attr("selected", true);
+        break;
+      case "maxSeason":
+        d3.select("#end-season-selector")
+          .select(`.yr${filter.data.threshold}`)
+          .attr("selected", true);
+        break;
+      case "span":
+        document.getElementById("span-filter-container").append(makeFilterSpan(filter.data.attribute, filter.data.comparator, filter.data.threshold));
+        break;
+    }
+  })
+}
+
+function loadView() {
+  // Parse query string: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  var qs = (function(a) {
+    if (a == "") return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i)
+    {
+        var p=a[i].split('=', 2);
+        if (p.length == 1)
+            b[p[0]] = "";
+        else
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+    return b;
+  })(window.location.search.substr(1).split('&'));
+  if(qs.v) {
+    deserializeView(qs.v);
+  };
+}
+
 function populateYearSelectors(data, startYear, endYear) {
   var selectors = d3.selectAll(".season-selector");
   selectors.selectAll("option").remove();
@@ -118,6 +173,9 @@ document.addEventListener('DOMContentLoaded', function () {
    "attrY",
    "attrArea"].forEach(function(name) { addPinner(name, gatherer); });
   addClickers();
+  document.getElementById("make-url").addEventListener("click", function() {
+    document.getElementById("url").value = gatherer.serializeToUrl();
+  });
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
   d3.json("data/all_data.json", function(error, data){
@@ -125,6 +183,8 @@ document.addEventListener('DOMContentLoaded', function () {
       gatherer.setData(data);
       populateYearSelectors(data, 2016, 2017);
     }
+    loadView();
+    gatherer.render();
   });
   gatherer.render();
 });

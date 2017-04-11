@@ -5,7 +5,7 @@ function makeFilterSpan(attrName, comparator, threshold) {
   var attrMap = Object.assign({}, attrs.basicAttributes, attrs.filterAttributes);
   filterSpan.className = "span-filter";
   filterSpan.innerText = `${attrMap[attrName]} ${comparator} ${threshold}`;
-  filterSpan.data = { type: "comparison", data :
+  filterSpan.data = { type: "span", data :
     { attribute: attrName, comparator: comparator, threshold: threshold } };
   return filterSpan;
 }

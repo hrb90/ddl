@@ -69,7 +69,6 @@ Gatherer.prototype.addListeners = function () {
 
 
 Gatherer.prototype.filter = function (data) {
-  console.log(this.filters);
   var filterFunctions = this.filters.map(makeFilterFunction);
   return data.filter(function(d) {
     return filterFunctions.every(function(f) { return f(d); } );
@@ -91,8 +90,8 @@ Gatherer.prototype.gatherFilters = function () {
   var filterList = [ { type: "position", data: { list: posList }}]
   var minYearFilter = document.getElementById('start-season-selector');
   var maxYearFilter = document.getElementById('end-season-selector');
-  filterList.push({ type: "comparison", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
-  filterList.push({ type: "comparison", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
+  filterList.push({ type: "minSeason", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
+  filterList.push({ type: "maxSeason", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
   var spanFilters = document.getElementsByClassName('span-filter');
   [].forEach.call(spanFilters, function(el) { filterList.push(el.data); });
   this.filters = filterList;
@@ -147,6 +146,7 @@ Gatherer.prototype.pinScale = function(attrName) {
 
 Gatherer.prototype.render = function () {
   this.gatherFilters();
+  console.log(this.gatherAttributeSelectors());
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
@@ -160,6 +160,14 @@ Gatherer.prototype.addHighlights = function(data, highlight) {
   var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
   return newData;
 };
+
+Gatherer.prototype.serializeToUrl = function() {
+  this.gatherFilters();
+  return `www.harrisonrbrown.com/ddl?v=${encodeURIComponent(JSON.stringify({
+    "attrSelectors": this.gatherAttributeSelectors(),
+    "filters": this.filters
+  }))}`;
+}
 
 Gatherer.prototype.setData = function(data) {
   this.data = data;

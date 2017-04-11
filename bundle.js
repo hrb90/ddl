@@ -16686,7 +16686,7 @@ function makeFilterSpan(attrName, comparator, threshold) {
   var attrMap = Object.assign({}, attrs.basicAttributes, attrs.filterAttributes);
   filterSpan.className = "span-filter";
   filterSpan.innerText = `${attrMap[attrName]} ${comparator} ${threshold}`;
-  filterSpan.data = { type: "comparison", data :
+  filterSpan.data = { type: "span", data :
     { attribute: attrName, comparator: comparator, threshold: threshold } };
   return filterSpan;
 }
@@ -49724,7 +49724,6 @@ Gatherer.prototype.addListeners = function () {
 
 
 Gatherer.prototype.filter = function (data) {
-  console.log(this.filters);
   var filterFunctions = this.filters.map(makeFilterFunction);
   return data.filter(function(d) {
     return filterFunctions.every(function(f) { return f(d); } );
@@ -49746,8 +49745,8 @@ Gatherer.prototype.gatherFilters = function () {
   var filterList = [ { type: "position", data: { list: posList }}]
   var minYearFilter = document.getElementById('start-season-selector');
   var maxYearFilter = document.getElementById('end-season-selector');
-  filterList.push({ type: "comparison", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
-  filterList.push({ type: "comparison", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
+  filterList.push({ type: "minSeason", data: { attribute: "season", comparator: ">=", threshold: parseInt(minYearFilter.value)}});
+  filterList.push({ type: "maxSeason", data: { attribute: "season", comparator: "<=", threshold: parseInt(maxYearFilter.value)}});
   var spanFilters = document.getElementsByClassName('span-filter');
   [].forEach.call(spanFilters, function(el) { filterList.push(el.data); });
   this.filters = filterList;
@@ -49802,6 +49801,7 @@ Gatherer.prototype.pinScale = function(attrName) {
 
 Gatherer.prototype.render = function () {
   this.gatherFilters();
+  console.log(this.gatherAttributeSelectors());
   var factories = this.makeFactories(this.gatherAttributeSelectors());
   this.canvas.setUpdaterFactory(factories.main);
   this.canvas.addTooltips(factories.tooltip);
@@ -49815,6 +49815,14 @@ Gatherer.prototype.addHighlights = function(data, highlight) {
   var newData = data.map(function(d) { d.highlight = highlight(d[attrHighlight]); return d; });
   return newData;
 };
+
+Gatherer.prototype.serializeToUrl = function() {
+  this.gatherFilters();
+  return `www.harrisonrbrown.com/ddl?v=${encodeURIComponent(JSON.stringify({
+    "attrSelectors": this.gatherAttributeSelectors(),
+    "filters": this.filters
+  }))}`;
+}
 
 Gatherer.prototype.setData = function(data) {
   this.data = data;
@@ -49893,6 +49901,61 @@ var Gatherer = __webpack_require__(8);
 var makeFilterSpan = __webpack_require__(2);
 var attributes = __webpack_require__(1);
 var nbaData = __webpack_require__(4);
+
+
+function deserializeView(viewString) {
+  var gatheredData = JSON.parse(viewString);
+  Object.keys(gatheredData.attrSelectors).forEach(function(name) {
+    d3.select(`#${name}`)
+      .select(`.${gatheredData.attrSelectors[name]}`)
+      .attr("selected", true);
+  });
+  let posFilters = d3.selectAll('.posFilter');
+  posFilters.property("checked", false);
+  d3.selectAll('.span-filter').remove();
+  gatheredData.filters.forEach(function(filter) {
+    switch(filter.type) {
+      case "position":
+        filter.data.list.forEach(pos => {
+          d3.select(`#chk${pos}`).property("checked", true);
+        })
+        break;
+      case "minSeason":
+        d3.select("#start-season-selector")
+          .select(`.yr${filter.data.threshold}`)
+          .attr("selected", true);
+        break;
+      case "maxSeason":
+        d3.select("#end-season-selector")
+          .select(`.yr${filter.data.threshold}`)
+          .attr("selected", true);
+        break;
+      case "span":
+        document.getElementById("span-filter-container").append(makeFilterSpan(filter.data.attribute, filter.data.comparator, filter.data.threshold));
+        break;
+    }
+  })
+}
+
+function loadView() {
+  // Parse query string: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  var qs = (function(a) {
+    if (a == "") return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i)
+    {
+        var p=a[i].split('=', 2);
+        if (p.length == 1)
+            b[p[0]] = "";
+        else
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+    return b;
+  })(window.location.search.substr(1).split('&'));
+  if(qs.v) {
+    deserializeView(qs.v);
+  };
+}
 
 function populateYearSelectors(data, startYear, endYear) {
   var selectors = d3.selectAll(".season-selector");
@@ -50005,6 +50068,9 @@ document.addEventListener('DOMContentLoaded', function () {
    "attrY",
    "attrArea"].forEach(function(name) { addPinner(name, gatherer); });
   addClickers();
+  document.getElementById("make-url").addEventListener("click", function() {
+    document.getElementById("url").value = gatherer.serializeToUrl();
+  });
   document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
   gatherer.setData(nbaData);
   d3.json("data/all_data.json", function(error, data){
@@ -50012,6 +50078,8 @@ document.addEventListener('DOMContentLoaded', function () {
       gatherer.setData(data);
       populateYearSelectors(data, 2016, 2017);
     }
+    loadView();
+    gatherer.render();
   });
   gatherer.render();
 });
