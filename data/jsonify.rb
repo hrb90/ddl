@@ -48,28 +48,33 @@ def transform_player_pg(row)
   new_row
 end
 
+def get_data_for_season(year)
+  players = {};
+  ['ADV', 'PG'].each do |type|
+    File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
+      csv = CSV.new(datafile, headers: true)
+      csv.to_a.each do |row|
+        if type == 'ADV'
+          data = transform_player_adv(row)
+          players[data["playerId"]] = data.merge({season: year})
+        else
+          data = transform_player_pg(row)
+          players[data["playerId"]] = players[data["playerId"]].merge(data)
+        end
+      end
+    end
+  end
+  players
+end
 
 def make_json(years)
   anuhliticks = []  # They're bullcrap, Erneh.
 
   years.each do |year|
-    players = {};
-    ['ADV', 'PG'].each do |type|
-      File.open("./csvs/#{year}_#{type}.csv", 'r') do |datafile|
-        csv = CSV.new(datafile, headers: true)
-        csv.to_a.each do |row|
-          if type == 'ADV'
-            data = transform_player_adv(row)
-            players[data["playerId"]] = data.merge({season: year})
-          else
-            data = transform_player_pg(row)
-            players[data["playerId"]] = players[data["playerId"]].merge(data)
-          end
-        end
-      end
-    end
-    anuhliticks += players.values
+    anuhliticks += get_data_for_season(year).values
   end
+
+  anuhliticks.select! { |player| player["minutes"] >= 100 }
 
   anuhliticks.to_json
 end
