@@ -5,7 +5,7 @@ var TooltipFactories = require('./appenders/tooltip_factory');
 var Gatherer = require('./gatherer');
 var makeFilterSpan = require('./make_filter_span');
 var attributes = require('./attrs');
-var nbaData = require('../data/placeholder_data.json');
+var nbaData = require('../data/all_data.json');
 
 
 function deserializeView(viewObject) {
@@ -112,6 +112,21 @@ function populateSelectors(selectors) {
   });
 }
 
+function filterMinutesByYears () {
+  var numYears = document.getElementById('start-season-selector').value -
+    document.getElementById('end-season-selector') + 1;
+
+  if (numYears <= 10) { } else if (numYears <= 13) {
+    document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", 500));
+  } else if (numYears <= 17) {
+    document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", 1000));
+  } else if (numYears <= 24) {
+    document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", 1500));
+  } else {
+    document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", 2000));
+  }
+};
+
 function addClickers() {
   document.getElementById("new-filter-button").addEventListener("click", function(e) {
     document.getElementById("new-filter-form").className = "";
@@ -138,6 +153,10 @@ function addClickers() {
     document.getElementById("how-to").className = "hidden";
     document.getElementById("main").className = "";
   });
+
+
+  document.getElementById("start-season-selector").addEventListener("change", filterMinutesByYears);
+  document.getElementById("end-season-selector").addEventListener("change", filterMinutesByYears);
 }
 
 function addPinner(attrName, gatherer) {
