@@ -5,7 +5,7 @@ var TooltipFactories = require('./appenders/tooltip_factory');
 var Gatherer = require('./gatherer');
 var makeFilterSpan = require('./make_filter_span');
 var attributes = require('./attrs');
-var nbaData = require('../data/all_data.json');
+var nbaData = require('../data/placeholder_data.json');
 
 
 function deserializeView(viewObject) {
