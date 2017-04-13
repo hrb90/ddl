@@ -167,7 +167,7 @@ ul {
   margin: 12px;
 }
 
-.span-filter {
+.span-filter, .pseudo-span-filter {
   background: lightsteelblue;
   opacity: 0.9;
   padding: 2px;

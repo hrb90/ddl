@@ -179,7 +179,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("url").value = gatherer.serializeToUrl();
     document.getElementById("url").select();
   });
-  document.getElementById("span-filter-container").append(makeFilterSpan("minutes", ">=", "400"));
+  var pseudoSpanFilter = makeFilterSpan("minutes", ">=", "100");
+  pseudoSpanFilter.className = "pseudo-span-filter";
+  document.getElementById("span-filter-container").append(pseudoSpanFilter);
   gatherer.setData(nbaData);
   d3.json("data/all_data.json", function(error, data){
     if (!error) {
