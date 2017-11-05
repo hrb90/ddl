@@ -80,9 +80,9 @@ def make_json(years)
 end
 
 File.open('./all_data.json', 'w') do |f|
-  f.puts(make_json((1980..2017).to_a))
+  f.puts(make_json((1980..2018).to_a))
 end
 
 File.open('./placeholder_data.json', 'w') do |f|
-  f.puts(make_json((2016..2017).to_a))
+  f.puts(make_json((2017..2018).to_a))
 end
