@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var canvas = new DDLCanvas("chart");
   var attrSelectors = d3.selectAll('.attr-selector');
   populateSelectors(attrSelectors);
-  populateYearSelectors(nbaData, 2016, 2017);
+  populateYearSelectors(nbaData, 2017, 2018);
   var gatherer = new Gatherer({
     main: circleUpdaterFactory,
     tooltip: TooltipFactories.makeBasicPlayerTooltipFactory
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
   d3.json("data/all_data.json", function(error, data){
     if (!error) {
       gatherer.setData(data);
-      populateYearSelectors(data, 2016, 2017);
+      populateYearSelectors(data, 2017, 2018);
     }
     loadView(gatherer.render);
   });
